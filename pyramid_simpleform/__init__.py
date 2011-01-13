@@ -118,7 +118,7 @@ class Form(object):
             params = self.request.params
         
         if self.validate_csrf:
-            value = params.get("_csrf", None)
+            value = params.pop("_csrf", None)
             if not value or value != self.request.session.get_csrf_token():
                 raise HTTPForbidden, "CSRF token is missing"
                 
@@ -224,7 +224,6 @@ class FormRenderer(object):
         """
         value = self.request.session.new_csrf_token()
         return self.hidden("_csrf", value=value)
-
 
     def text(self, name, value=None, id=None, **attrs):
         return h.text(name, self.value(name, value), id, **attrs)

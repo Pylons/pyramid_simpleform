@@ -44,8 +44,6 @@ class MainHandler(object):
             
             return HTTPFound(location="/")
 
-        print form.errors
-
         return dict(item=item, form=form.get_renderer())
 
     @action(renderer='submit.html')
