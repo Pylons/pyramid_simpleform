@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+    {% for item in items %}
+    <div>
+    Name: {{ item.name }} Value: {{ item.value }} <a href="{{ request.route_url('edit', item_id=item.id) }}">edit</a>
+    </div>
+    {% endfor %}
+    <a href="{{ request.route_url('add') }}">add</a>
+</body>
+</html>

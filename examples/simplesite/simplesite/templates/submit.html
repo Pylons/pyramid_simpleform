@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+    <h2>Add a new item</h2>
+    {{ form.begin(request.route_url('add')) }}
+    {{ form.csrf() }}
+    <div>
+        {{ form.text('name') }}
+    </div>
+    <div>
+        {{ form.text('value') }}
+    </div> 
+    {{ form.submit("submit", "Add") }}
+    {{ form.end() }}
+</body>
+</html>
