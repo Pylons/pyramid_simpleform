@@ -241,7 +241,7 @@ class FormRenderer(object):
         return h.submit(name, self.value(name, value), id, **attrs)
 
     def select(self, name, options, selected_value=None, id=None, **attrs):
-        return h.select(name, self.value(name, selected_values), 
+        return h.select(name, self.value(name, selected_value), 
                         options, id, **attrs)
 
     def checkbox(self, name, value="1", checked=False, label=None, id=None, 

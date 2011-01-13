@@ -17,6 +17,7 @@ class MyModelSchema(Schema):
     name = validators.MinLength(5, not_empty=True)
     value = validators.Int(not_empty=True)
 
+
 log = logging.getLogger(__name__)
 
 class MainHandler(object):
