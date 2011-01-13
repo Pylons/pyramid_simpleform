@@ -31,6 +31,10 @@ def main(global_config, **settings):
     config.add_handler('add', '/submit/', 'simplesite.handlers:MainHandler',
                        action='submit')
 
+    config.add_handler('edit', '/edit/{item_id}/', 
+                       'simplesite.handlers:MainHandler',
+                       action='edit')
+
 
     config.add_handler('main', '/{action}', 'simplesite.handlers:MainHandler',
         path_info=r'/(?!favicon\.ico|robots\.txt|w3c)')

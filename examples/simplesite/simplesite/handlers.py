@@ -32,14 +32,15 @@ class MainHandler(object):
     def edit(self):
 
         session = Session()
-        item_id = request.multidict['item_id']
+        item_id = self.request.matchdict['item_id']
         item = session.query(MyModel).get(item_id)
 
         form = Form(self.request, schema=MyModelSchema, obj=item)
 
         if form.validate():
             
-            form.bind(obj)
+            form.bind(item)
+            session.merge(item)
             session.flush()
             
             return HTTPFound(location="/")
