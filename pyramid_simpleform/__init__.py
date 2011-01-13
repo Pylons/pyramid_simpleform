@@ -1,6 +1,6 @@
 import webhelpers.html.tags as h
 
-#from webhelpers.html.builder import tag
+from webhelpers.html.builder import HTML
 
 from formencode import variabledecode
 from formencode import Invalid
@@ -121,7 +121,6 @@ class Form(object):
             value = params.pop("_csrf", None)
             if not value or value != self.request.session.get_csrf_token():
                 raise HTTPForbidden, "CSRF token is missing"
-                
 
         if self.variable_decode:
             decoded = variabledecode.variable_decode(
@@ -260,7 +259,7 @@ class FormRenderer(object):
         if 'for_' not in attrs:
             attrs['for_'] = name
         label = label or name.capitalize()
-        return tag("label", label, **attrs)
+        return HTML.tag("label", label, **attrs)
         
     def is_error(self, name):
         return self.form.is_error(name)

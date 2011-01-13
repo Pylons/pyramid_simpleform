@@ -9,9 +9,11 @@
     {{ form.begin(request.route_url('add')) }}
     {{ form.csrf() }}
     <div>
+        {{ form.label("name") }}
         {{ form.text('name') }}
     </div>
     <div>
+        {{ form.label("value") }}
         {{ form.text('value') }}
     </div> 
     {{ form.submit("submit", "Add") }}
