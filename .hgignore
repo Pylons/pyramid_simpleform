@@ -2,6 +2,7 @@ syntax: glob
 
 *.coverage
 *.egg-info
+*.egg
 *.log
 *.pyc
 *.db
@@ -18,9 +19,8 @@ syntax: glob
 
 dist
 data
+build
 docs/output
-
-_uploads
 
 .git
 .gitignore
