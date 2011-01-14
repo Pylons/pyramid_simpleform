@@ -33,6 +33,7 @@ class MainHandler(object):
     def edit(self):
 
         session = Session()
+
         item_id = self.request.matchdict['item_id']
         item = session.query(MyModel).get(item_id)
 

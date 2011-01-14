@@ -18,18 +18,31 @@ class TestCase(unittest.TestCase):
 
 class TestForm(unittest.TestCase):
     
+    def test_is_error(self):
+        assert False, "not implemented"
+
+    def test_errors_for(self):
+        assert False, "not implemented"
+
+    def test_validate_with_validators(self):
+        assert False, "not implemented"
+
     def test_is_validated_on_post(self):
         assert False, "not implemented"
 
-
     def test_validate_good_input(self):
         assert False, "not implemented"
-
 
     def test_validate_bad_input(self):
         assert False, "not implemented"
     
     def test_bind(self):
+        assert False, "not implemented"
+
+    def test_bind_not_validated_yet(self):
+        assert False, "not implemented"
+
+    def test_bind_with_errors(self):
         assert False, "not implemented"
 
     def test_initialize_with_obj(self):
@@ -65,3 +78,11 @@ class TestFormRenderer(unittest.TestCase):
     def test_file(self):
         assert False, "not implemented"
 
+    def test_radio(self):
+        assert False, "not implemented"
+
+    def test_submit(self):
+        assert False, "not implemented"
+
+    def test_checkbox(self):
+        assert False, "not implemented"
