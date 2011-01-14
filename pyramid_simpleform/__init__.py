@@ -166,7 +166,8 @@ class Form(object):
         **kwargs  : passed to htmlfill
         """
 
-        kwargs.setdefault('encoding', self.request.charset)
+        charset = getattr(self.request, 'charset', 'utf-8')
+        htmlfill_kwargs.setdefault('encoding', charset)
         return htmlfill.render(content, 
                                defaults=self.data,
                                errors=self.errors,

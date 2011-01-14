@@ -153,7 +153,21 @@ class TestForm(unittest.TestCase):
         assert False, "not implemented"
 
     def test_htmlfill(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, 
+                    defaults={"name" : "testing"})
+
+        html = """
+        <form method="POST" action=".">
+            <input type="text" name="name">
+        </form>
+        """
+
+        html = form.htmlfill(html)
+        self.assert_('value="testing"' in html)
+
 
 class TestFormRenderer(unittest.TestCase):
     
