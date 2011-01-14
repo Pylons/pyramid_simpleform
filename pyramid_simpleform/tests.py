@@ -127,7 +127,13 @@ class TestForm(unittest.TestCase):
         form = Form(request, SimpleSchema, validate_csrf=False)
         self.assert_(not form.validate())
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
+
+    def test_bind_with_exclude(self):
+        assert False, "not implemented"
  
+    def test_bind_with_include(self):
+        assert False, "not implemented"
+
     def test_initialize_with_obj(self):
         from pyramid_simpleform import Form
 

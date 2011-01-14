@@ -3,7 +3,7 @@ import logging
 from pyramid.view import action
 from pyramid.url import route_url
 from pyramid.httpexceptions import HTTPFound
-from pyramid_simpleform import Form
+from pyramid_simpleform import Form, FormRenderer
 
 from formencode import Schema, validators
 
@@ -47,7 +47,7 @@ class MainHandler(object):
             
             return HTTPFound(location="/")
 
-        return dict(item=item, form=form.get_renderer())
+        return dict(item=item, form=FormRenderer(form))
 
     @action(renderer='submit.html')
     def submit(self):
@@ -64,4 +64,4 @@ class MainHandler(object):
 
             return HTTPFound(location="/")
 
-        return dict(form=form.get_renderer())
+        return dict(form=FormRenderer(form))

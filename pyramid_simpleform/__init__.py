@@ -28,13 +28,12 @@ class Form(object):
     `dict_char`       : variabledecode dict char
     `list_char`       : variabledecode list char
 
-    `renderer_class`  : class used to render the form. Uses FormRenderer by default.
     """
 
     def __init__(self, request, schema=None, validators=None, defaults=None, 
                  obj=None, state=None, method="POST", validate_csrf=True,
                  variable_decode=True, dict_char=".", list_char="-",
-                 multipart=False, renderer_class=None):
+                 multipart=False):
 
         self.request = request
         self.schema = schema
@@ -52,8 +51,6 @@ class Form(object):
         self.errors = {}
         self.data = {}
 
-        self.renderer_class = renderer_class or FormRenderer
-        
         if defaults:
             self.data.update(defaults)
 
@@ -63,12 +60,6 @@ class Form(object):
 
         assert self.schema or self.validators, \
                 "validators and/or schema required"
-
-    def get_renderer(self):
-        """
-        Returns a renderer instance based on renderer_class.
-        """
-        return self.renderer_class(self)
 
     def is_error(self, field):
         """
