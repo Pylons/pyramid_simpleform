@@ -35,6 +35,6 @@ setup(name='pyramid_simpleform',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="",
+      test_suite="pyramid_simpleform",
       )
 
