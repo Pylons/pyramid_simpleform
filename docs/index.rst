@@ -112,7 +112,7 @@ This renders a hidden CSRF widget that helps you keep your users safe. We'll com
 CSRF validation
 ---------------
 
-**pyramid_simpleform** also does CSRF validation for you, with the help of Pyramid's underlying CSRF support. In order to use this with your FormEncode schema, remember to set **allow_extra_fields** and **filter_extra_fields** both to **True** (a handy tip if you have a lot of schemas is to create a BaseSchema with these set by default, and just subclass that for your other schemas).
+**pyramid_simpleform** also does CSRF validation for you, with the help of Pyramid's underlying CSRF support. 
 
 The default **FormRenderer** also has a method **csrf()** which renders a hidden input with a fresh CSRF token. This is reset with each request. You have to include this in your form for this to work.
 

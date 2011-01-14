@@ -19,8 +19,7 @@ class Form(object):
 
     `defaults`   : a dict of default values
     `obj`        : instance of an object (e.g. SQLAlchemy model)
-    `state`      : state passed to FormEncode validators. If not present then 
-                   `obj` is passed instead
+    `state`      : state passed to FormEncode validators.
 
     `method`        : HTTP method
     `validate_csrf` : CSRF validation will be run. Raises HTTPForbidden if fails.
@@ -39,13 +38,14 @@ class Form(object):
 
         self.request = request
         self.schema = schema
-        self.validators = None
+        self.validators = validators
         self.method = method
         self.variable_decode = variable_decode
         self.dict_char = dict_char
         self.list_char = list_char
         self.validate_csrf = validate_csrf
         self.multipart = multipart
+        self.state = state
 
         self.is_validated = False
 
@@ -59,10 +59,7 @@ class Form(object):
 
         if obj:
             self.data.update(obj.__dict__)
-            if state is None:
-                state = obj
 
-        self.state = state
 
         assert self.schema or self.validators, \
                 "validators and/or schema required"

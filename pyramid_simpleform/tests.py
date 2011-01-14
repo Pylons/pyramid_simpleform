@@ -1,5 +1,8 @@
 import unittest
 
+from formencode import Schema
+from formencode import validators
+
 from pyramid import testing
 from pyramid.config import Configurator
 
@@ -8,7 +11,8 @@ class TestCase(unittest.TestCase):
     def setUp(self):
 
         self.config = Configurator(autocommit=True)
-        self.config.begin()
+        request = testing.DummyRequest()
+        self.config.begin(request=request)
 
         #
 
@@ -16,16 +20,58 @@ class TestCase(unittest.TestCase):
         self.config.end()
 
 
+class SimpleSchema(Schema):
+
+    name = validators.NotEmpty()
+
+
 class TestForm(unittest.TestCase):
     
     def test_is_error(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema, validate_csrf=False)
+
+        self.assert_(not(form.validate()))
+        self.assert_(form.is_validated)
+        self.assert_('name' in form.errors)
 
     def test_errors_for(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema, validate_csrf=False)
+
+        self.assert_(not(form.validate()))
+        self.assert_(form.is_validated)
+        self.assert_('name' in form.errors)
+
+        self.assert_(form.errors_for('name') == ['Missing value'])
+
+
+    def test_validate_good_form_with_validators(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = {'name' : 'ok'}
+
+        form = Form(request, 
+                    validators=dict(name=validators.NotEmpty()), 
+                    validate_csrf=False)
+
+        self.assert_(form.validate())
+        self.assert_(form.is_validated)
+        self.assert_(form.data['name'] == 'ok')
+
+    def test_validate_bad_form_with_validators(self):
         assert False, "not implemented"
 
-    def test_validate_with_validators(self):
-        assert False, "not implemented"
 
     def test_is_validated_on_post(self):
         assert False, "not implemented"
@@ -86,3 +132,10 @@ class TestFormRenderer(unittest.TestCase):
 
     def test_checkbox(self):
         assert False, "not implemented"
+
+    def test_label(self):
+        assert False, "not implemented"
+
+    def test_label_using_field_name(self):
+        assert False, "not implemented"
+
