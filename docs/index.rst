@@ -39,7 +39,7 @@ In short, this is what the view looks like. We'll skip all the other views and s
     from pyramid.view import view_config
     from pyramid.httpexceptions import HTTPFound
 
-    from pyramid_simpleform import Form
+    from pyramid_simpleform import Form, FormRenderer
 
     from myapp.models import BlogPost
 
@@ -66,7 +66,7 @@ In short, this is what the view looks like. We'll skip all the other views and s
 
             return HTTPFound(location="/")
 
-        return dict(form=form.get_renderer())
+        return dict(form=FormRenderer(form))
 
 
 The code is very simple. The **Form** instance is initialized with the request and your schema - it can be a **Schema** class or instance. The **validate** method does two things. First, it checks if the form should be validated (more of which in a moment) and if so it does the validation. It just returns a simple **True** or **False** depending on whether you are OK to continue or not. You can then access the validated data directly through the **data** property. If validation fails, the errors are dumped into the **errors** property.
@@ -118,6 +118,7 @@ This will create a new CSRF token if one is not already assigned, using Pyramid'
 
 There is also a convenience method **csrf_token()** which will render the CSRF input inside a hidden DIV, in order to maintain valid markup.
 
+
 It's up to you to ensure that your form does proper CSRF validation. One suggestion is to create an event to do this automatically with all non-AJAX POST requests::
 
     # in your subscribers.py
@@ -155,7 +156,7 @@ The **bind()** method sets the properties of the object from the fields in your 
 
             return HTTPFound(location="/")
     
-    return dict(form=form.get_renderer())
+    return dict(form=FormRenderer(form))
  
 You can pass a couple of arguments, ``include`` and ``exclude`` to **bind()** to filter out any fields you explicitly don't want bound. This can of course be done in the schema using **filter_extra_fields** but sometimes it pays to be extra careful. For example, you don't
 want the "date_created" field to be overriden in the form::
@@ -177,8 +178,11 @@ The default **FormRenderer** should cover most cases, but you might want to do s
             return self.input('search', name, value, id, **attrs)
 
 
-Then just set the **renderer_class** property of the form::
+Then just use this class in place of FormRenderer::
 
-    form = Form(request, BlogPostSchema, renderer_class=HTML5FormRenderer)
+    renderer = HTML5FormRenderer(form)
+
+Other examples of renderers might be one that uses FormEncode's **htmlfill** library, or returns JSON. These are being considered for future versions.
+
 
 
