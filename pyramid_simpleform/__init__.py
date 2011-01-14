@@ -250,10 +250,10 @@ class FormRenderer(object):
         return h.checkbox(name, value, self.value(name), label, id, **attrs)
 
     def textarea(self, name, content="", id=None, **attrs):
-        return h.textarea(name, self.value(name, content), id, attrs)
+        return h.textarea(name, self.value(name, content), id, **attrs)
 
     def password(self, name, value=None, id=None, **attrs):
-        return h.password(name, self.value(name, value), id, attrs)
+        return h.password(name, self.value(name, value), id, **attrs)
 
     def label(self, name, label=None, **attrs):
         if 'for_' not in attrs:
