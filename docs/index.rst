@@ -112,13 +112,29 @@ This renders a hidden CSRF widget that helps you keep your users safe. We'll com
 CSRF validation
 ---------------
 
-**pyramid_simpleform** also does CSRF validation for you, with the help of Pyramid's underlying CSRF support. 
-
 The default **FormRenderer** also has a method **csrf()** which renders a hidden input with a fresh CSRF token. This is reset with each request. You have to include this in your form for this to work.
 
-If for whatever reason the token is missing, or the token in your session doesn't match the one passed by your form, an **HTTPForbidden** exception is raised.
+This will create a new CSRF token if one is not already assigned, using Pyramid's underlying CSRF functionality.
 
-If you don't want to do CSRF validation in your form (for example, if processing an AJAX form) just pass **validate_csrf=False** in your **Form** constructor.
+There is also a convenience method **csrf_token()** which will render the CSRF input inside a hidden DIV, in order to maintain valid markup.
+
+It's up to you to ensure that your form does proper CSRF validation. One suggestion is to create an event to do this automatically with all non-AJAX POST requests::
+
+    # in your subscribers.py
+
+    def csrf_validation(request):
+
+        if request.method == "POST" and not request.is_xhr:
+
+            token = request.POST.get("_csrf")
+            if not token or token != request.session.get_csrf_token():
+                raise HTTPForbidden, "CSRF token is invalid or missing"
+
+    # in your main() function
+
+    config.add_subscriber("myapp.subscribers.csrf_validation", 
+                          event=NewRequest)
+
 
 Working with models
 -------------------

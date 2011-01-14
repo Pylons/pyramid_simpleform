@@ -26,7 +26,7 @@ class TestForm(unittest.TestCase):
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
@@ -38,7 +38,7 @@ class TestForm(unittest.TestCase):
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
@@ -55,8 +55,7 @@ class TestForm(unittest.TestCase):
         request.POST = {'name' : 'ok'}
 
         form = Form(request, 
-                    validators=dict(name=validators.NotEmpty()), 
-                    validate_csrf=False)
+                    validators=dict(name=validators.NotEmpty()))
 
         self.assert_(form.validate())
         self.assert_(form.is_validated)
@@ -69,8 +68,7 @@ class TestForm(unittest.TestCase):
         request.method = "POST"
 
         form = Form(request, 
-                    validators=dict(name=validators.NotEmpty()), 
-                    validate_csrf=False)
+                    validators=dict(name=validators.NotEmpty()))
 
         self.assert_(not form.validate())
         self.assert_(form.is_validated)
@@ -84,7 +82,7 @@ class TestForm(unittest.TestCase):
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
@@ -102,7 +100,7 @@ class TestForm(unittest.TestCase):
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
         form.validate()
         obj = form.bind(SimpleObj())
         self.assert_(obj.name == 'test')
@@ -114,7 +112,7 @@ class TestForm(unittest.TestCase):
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
  
     def test_bind_with_errors(self):
@@ -124,7 +122,7 @@ class TestForm(unittest.TestCase):
         request.method = "POST"
         request.POST['name'] = ''
 
-        form = Form(request, SimpleSchema, validate_csrf=False)
+        form = Form(request, SimpleSchema)
         self.assert_(not form.validate())
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
 
@@ -154,8 +152,6 @@ class TestForm(unittest.TestCase):
     def test_validate_from_GET(self):
         assert False, "not implemented"
 
-    def test_validate_csrf(self):
-        assert False, "not implemented"
 
 
 class TestFormRenderer(unittest.TestCase):

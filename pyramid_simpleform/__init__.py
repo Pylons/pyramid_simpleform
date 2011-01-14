@@ -5,8 +5,6 @@ from webhelpers.html.builder import HTML
 from formencode import variabledecode
 from formencode import Invalid
 
-from pyramid.httpexceptions import HTTPForbidden
-
 __all__ = ["Form", "FormRenderer"]
 
 class Form(object):
@@ -22,7 +20,6 @@ class Form(object):
     `state`      : state passed to FormEncode validators.
 
     `method`        : HTTP method
-    `validate_csrf` : CSRF validation will be run. Raises HTTPForbidden if fails.
 
     `variable_decode` : will decode dict/lists
     `dict_char`       : variabledecode dict char
@@ -31,9 +28,8 @@ class Form(object):
     """
 
     def __init__(self, request, schema=None, validators=None, defaults=None, 
-                 obj=None, state=None, method="POST", validate_csrf=True,
-                 variable_decode=True, dict_char=".", list_char="-",
-                 multipart=False):
+                 obj=None, state=None, method="POST", variable_decode=True, 
+                 dict_char=".", list_char="-", multipart=False):
 
         self.request = request
         self.schema = schema
@@ -42,7 +38,6 @@ class Form(object):
         self.variable_decode = variable_decode
         self.dict_char = dict_char
         self.list_char = list_char
-        self.validate_csrf = validate_csrf
         self.multipart = multipart
         self.state = state
 
@@ -84,8 +79,6 @@ class Form(object):
         This will check if the form should be validated (i.e. the
         request method matches) and the schema/validators validate.
 
-        Will also check CSRF if validate_csrf is True.
-
         Validation will only be run once; subsequent calls to 
         validate() will have no effect, i.e. will just return
         the original result.
@@ -105,11 +98,6 @@ class Form(object):
         else:
             params = self.request.params
         
-        if self.validate_csrf:
-            value = params.pop("_csrf", None)
-            if not value or value != self.request.session.get_csrf_token():
-                raise HTTPForbidden, "CSRF token is missing"
-
         if self.variable_decode:
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
@@ -207,10 +195,20 @@ class FormRenderer(object):
     
     def csrf(self):
         """
-        Returns the CSRF hidden tag
+        Returns the CSRF hidden input. Creates new CSRF token
+        if none has been assigned yet.
         """
-        value = self.request.session.new_csrf_token()
-        return self.hidden("_csrf", value=value)
+        token = self.request.session.get_csrf_token()
+        if token is None:
+            token = self.request.session.new_csrf_token()
+
+        return self.hidden("_csrf", value=token)
+
+    def csrf_token(self):
+        """
+        Convenience function. Returns CSRF hidden tag inside hidden DIV.
+        """
+        return HTML.tag("div", self.csrf(), style="display:none;")
 
     def text(self, name, value=None, id=None, **attrs):
         return h.text(name, self.value(name, value), id, **attrs)
