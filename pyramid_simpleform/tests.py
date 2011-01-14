@@ -6,19 +6,6 @@ from formencode import validators
 from pyramid import testing
 from pyramid.config import Configurator
 
-class TestCase(unittest.TestCase):
-
-    def setUp(self):
-
-        self.config = Configurator(autocommit=True)
-        request = testing.DummyRequest()
-        self.config.begin(request=request)
-
-        #
-
-    def tearDown(self):
-        self.config.end()
-
 
 class SimpleSchema(Schema):
 
