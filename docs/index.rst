@@ -3,6 +3,8 @@ pyramid_simpleform
 
 **pyramid_simpleform** provides some simple helper classes for managing your forms in a Pyramid project. It uses FormEncode and WebHelpers for most of the heavy lifting, so if you're familiar with these most of this will be familiar to you. It doesn't require any special setup or ZCML voodoo and is template-agnostic.
 
+While **pyramid_simpleform** uses FormEncode, it has also been inspired by libraries such as Django forms, WTForms and Flatland. Unlike these libraries it's designed as a simple wrapper around existing form validation and rendering tools, and is specifically intended for use with Pyramid.
+
 Installation
 ------------
 
@@ -66,75 +68,10 @@ In short, this is what the view looks like. We'll skip all the other views and s
 
             return HTTPFound(location="/")
 
-        return dict(form=FormRenderer(form))
+        return dict(form=form)
 
 
 The code is very simple. The **Form** instance is initialized with the request and your schema - it can be a **Schema** class or instance. The **validate** method does two things. First, it checks if the form should be validated (more of which in a moment) and if so it does the validation. It just returns a simple **True** or **False** depending on whether you are OK to continue or not. You can then access the validated data directly through the **data** property. If validation fails, the errors are dumped into the **errors** property.
-
-If validation hasn't yet happened, or if the form contains errors, you want to display the template with the form. We pass that into the template the usual way, but notice that instead of passing the form directly, we call **form.get_renderer()**. This returns an object whose job it is to do the actual rendering of all the bits of HTML that show the form to the user. Here's ``submit.html`` (using Jinja2 syntax)::
-
-    {{ form.begin(".") }}
-    <div style="display:none;">
-        {{ form.csrf() }}
-    </div>
-    <div>
-        {% if form.is_errors("title") %}
-        <ul class="errors">
-            {% for error in form.errors_for("title") %}
-            <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {{ form.label("title") }}
-        {{ form.text("title", size=40) }}
-    </div>
-    <div>
-        {{ form.label("content") }}
-        {{ form.textarea("content", rows=5, cols=40) }}
-    </div>
-    <div>
-        {{ form.submit("submit", "Publish") }}
-    </div>
-    {{ form.end() }}
-
-As you can see, a lot of layout and rendering control is ceded to the template. That's intentional. Some form libraries let you do this::
-
-    {{ form.render() }}
-
-which renders the entire thing, all the **div** tags and all. However managing this is far from simple. What if you want paragraphs or list items instead ? Where do you store the templates ? What if your designer wants you to break the form up into separate columns, or you need some fancy JavaScript effects on the side ? The easiest place to do all of that is in the template. The renderer simply makes it easy to output the little form widgets for you. If you have lots of repetitive markup (for example rendering errors) the best solution is to use a Mako/Jinja2 macro, or whatever your template engine of choice supports. 
-
-Notice this line::
-
-    {{ form.csrf() }}
-
-This renders a hidden CSRF widget that helps you keep your users safe. We'll come back to that later.
-
-CSRF validation
----------------
-
-The default **FormRenderer** also has a method **csrf()** which renders a hidden input with a fresh CSRF token. This is reset with each request. You have to include this in your form for this to work.
-
-This will create a new CSRF token if one is not already assigned, using Pyramid's underlying CSRF functionality.
-
-There is also a convenience method **csrf_token()** which will render the CSRF input inside a hidden DIV, in order to maintain valid markup.
-
-
-It's up to you to ensure that your form does proper CSRF validation. One suggestion is to create an event to do this automatically with all non-AJAX POST requests::
-
-    # in your subscribers.py
-
-    def csrf_validation(request):
-
-        if request.method == "POST" and not request.is_xhr:
-
-            token = request.POST.get("_csrf")
-            if not token or token != request.session.get_csrf_token():
-                raise HTTPForbidden, "CSRF token is invalid or missing"
-
-    # in your main() function
-
-    config.add_subscriber("myapp.subscribers.csrf_validation", 
-                          event=NewRequest)
 
 
 Working with models
@@ -164,6 +101,28 @@ want the "date_created" field to be overriden in the form::
     post = form.bind(BlogPost(), exclude=["date_created"])
 
 If you try to call **bind()** before running **validate()**, or if your form has errors, it will blow up with a **RuntimeError**.
+
+When you create your **Form** instance you can pass in ``obj`` rather than ``defaults``. While ``defaults`` expects a dict, the ``obj`` properties will be used to automatically pre-fill your form fields::
+
+    form = Form(request, schema=BlogPostSchema, obj=item)
+
+CSRF validation
+---------------
+
+Form rendering
+--------------
+
+You can render your form in any way you like: the **Form** class just provides the basic wrapper. It includes however an **htmlfill()** method to wrap the output content::
+
+    form = Form(request, BlogPostSchema)
+    return form.htmlfill(render_response("submit.html", dict(form=form)))
+
+However many people don't like htmlfill, and prefer to output default values, errors etc. manually (with the help of template macros and other helpers). 
+
+In either case, **pyramid_simpleform** comes with a **FormRenderer** class to help you output individual widgets. It uses the WebHelpers library under the hood. 
+
+If you need to create special widgets (e.g. new HTML5 input types) just subclass **FormRenderer**.
+
 
 Custom renderers
 ----------------

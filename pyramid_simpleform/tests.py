@@ -152,7 +152,8 @@ class TestForm(unittest.TestCase):
     def test_validate_from_GET(self):
         assert False, "not implemented"
 
-
+    def test_htmlfill(self):
+        assert False, "not implemented"
 
 class TestFormRenderer(unittest.TestCase):
     
