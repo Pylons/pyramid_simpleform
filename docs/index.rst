@@ -81,13 +81,7 @@ In your template (using `Jinja2`_ in this example)::
     {{ renderer.begin(route_url("submit") }}
     {{ renderer.csrf_token() }}
     <div class="field">
-        {% if renderer.form.is_error('name') %}
-        <ul class="errors">
-        {% for error in renderer.form.errors_for('name') %}
-        <li>{{ error }}</li>
-        {% endfor %}
-        </ul>
-        {% endif %}
+        {{ renderer.errorlist("name") }}
         {{ renderer.text("name", size=30)
     </div>
     ....
