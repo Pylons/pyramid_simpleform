@@ -9,10 +9,12 @@
     {{ form.begin(request.route_url('edit', item_id=item.id)) }}
     {{ form.csrf() }}
     <div>
+        {{ form.errorlist("name") }}
         {{ form.label("name") }}
         {{ form.text('name') }}
     </div>
     <div>
+        {{ form.errorlist("value") }}
         {{ form.label("value") }}
         {{ form.text('value') }}
     </div> 

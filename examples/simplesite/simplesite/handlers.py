@@ -3,7 +3,8 @@ import logging
 from pyramid.view import action
 from pyramid.url import route_url
 from pyramid.httpexceptions import HTTPFound
-from pyramid_simpleform import Form, FormRenderer
+from pyramid_simpleform import Form
+from pyramid_simpleform.renderers import FormRenderer
 
 from formencode import Schema, validators
 
