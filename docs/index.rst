@@ -10,7 +10,7 @@ Install using **pip install pyramid_simpleform** or **easy_install pyramid_simpl
 
 If installing from source, untar/unzip, cd into the directory and do **python setup.py install**.
 
-The source repository is on Bitbucket.
+The source repository is on `Bitbucket`_. Please report any bugs, issues or queries there. 
 
 Getting started
 ---------------
@@ -74,7 +74,27 @@ Here is a typical example::
 
                 return HTTPFound(location="/")
 
-        return dict(form=FormRenderer(form))
+        return dict(renderer=FormRenderer(form))
+
+In your template (using Jinja2 in this example)::
+
+    {{ renderer.begin(route_url("submit") }}
+    {{ renderer.csrf_token() }}
+    <div class="field">
+        {% if renderer.form.is_error('name') %}
+        <ul class="errors">
+        {% for error in renderer.form.errors_for('name') %}
+        <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {{ renderer.text("name", size=30)
+    </div>
+    ....
+    <div class="buttons">
+        {{ renderer.submit("submit", "Submit") }}
+    </div>
+    {{ renderer.end() }}
 
 The steps are:
 
@@ -92,6 +112,8 @@ Validation
 The **validate()** method does two things. First, it checks if the form should be validated. Second, it performs the validation against your schema or validators. 
 
 By default, validation will run if the request method is HTTP POST. This is set by the `method` argument to the constructor.
+
+The validated values, or values from the request, are passed to the **data** property. Any errors are passed to the **errors** property.
 
 Working with models
 -------------------

@@ -131,9 +131,10 @@ class Form(object):
         SQLAlchemy model instance.
 
         `include` : list of included fields. If field not in this list it 
-                    will not be bound to this object.
+        will not be bound to this object.
+
         `exclude` : list of excluded fields. If field is in this list it 
-                    will not be bound to the object.
+        will not be bound to the object.
 
         Returns the `obj` passed in.
 
@@ -161,9 +162,7 @@ class Form(object):
 
     def htmlfill(self, content, **htmlfill_kwargs):
         """
-        Runs FormEncode html on content.
-        `content` : HTML content to filter
-        **kwargs  : passed to htmlfill
+        Runs FormEncode **htmlfill** on content.
         """
 
         charset = getattr(self.request, 'charset', 'utf-8')

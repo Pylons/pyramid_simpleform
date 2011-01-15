@@ -243,7 +243,7 @@ class TestFormRenderer(unittest.TestCase):
         form = Form(request, SimpleSchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.begin(action="/"),
+        self.assert_(renderer.begin(url="/"),
                      '<form action="/" method="post">')
 
     def test_end_form(self):
