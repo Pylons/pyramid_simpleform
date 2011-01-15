@@ -1,147 +1,158 @@
 pyramid_simpleform
 ==================
 
-**pyramid_simpleform** provides some simple helper classes for managing your forms in a Pyramid project. It uses FormEncode and WebHelpers for most of the heavy lifting, so if you're familiar with these most of this will be familiar to you. It doesn't require any special setup or ZCML voodoo and is template-agnostic.
-
-While **pyramid_simpleform** uses FormEncode, it has also been inspired by libraries such as Django forms, WTForms and Flatland. Unlike these libraries it's designed as a simple wrapper around existing form validation and rendering tools, and is specifically intended for use with Pyramid.
+**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by Django forms, WTForms and Flatland. However it's also intended for use with the Pyramid framework and uses FormEncode for most of the heavy lifting. It's therefore assumed you are already familiar with FormEncode.
 
 Installation
 ------------
 
-Once this is in PyPi, you should be able to just do **pip install pyramid_simpleform**. For now, download the source, cd into the directory, and do **python setup.py install**.
+Install using **pip install pyramid_simpleform** or **easy_install pyramid_simpleform**.
+
+If installing from source, untar/unzip, cd into the directory and do **python setup.py install**.
+
+The source repository is on Bitbucket.
 
 Getting started
 ---------------
 
-Once you've installed **pyramid_simpleform** you first need to create a set of **FormEncode** validators or schemas.
+**pyramid_simpleform** doesn't require any special configuration using ZCML or otherwise. You just create FormEncode schemas or validators for your application as usual, and wrap them in a special **Form** class. The **Form** provides a number of helper methods to make form handling as painless, and still flexible, as possible.
 
-For example, if you're building a blog application (just to be original) you might have a "BlogPost" model. It doesn't matter whether this is a SQLAlchemy model, ZODB thingamjig or some other creation. We'll represent it here as a plain Python object::
+Here is a typical example::
 
-    from datetime import datetime
+    from pyramid.view import action
+    from validators import Schema, validators
 
-    class BlogPost(object):
+    from pyramid_simpleform import Form
+    from pyramid_simpleform.renderers import FormRenderer
 
-        def __init__(self, title=None, content=None):
-            self.title = title
-            self.content = content
-            self.date_created = datetime.utcnow()
+    class MyModelSchema(Schema):
 
-We want to create a simple submit view to create new blog posts. Basically, the steps are:
-
-1. If you arrive at the page via a simple GET, render the form. 
-2. If you submit (POST) the form, do validation
-3. If the form is valid, enter the blog post in the database and redirect somewhere else.
-4. If the form isn't valid, re-display the original form with the errors shown plus the stuff you entered.
-
-That's pretty much what most forms have to do.
-
-In short, this is what the view looks like. We'll skip all the other views and security stuff for the sake of clarity::
-
-
-    from pyramid.view import view_config
-    from pyramid.httpexceptions import HTTPFound
-
-    from pyramid_simpleform import Form, FormRenderer
-
-    from myapp.models import BlogPost
-
-    class BlogPostSchema(Schema):
-
-        allow_extra_fields = True
         filter_extra_fields = True
+        allow_extra_fields = True
 
-        title = validators.MinLength(10, not_empty=True)
-        content = validators.NotEmpty()
+        name = validators.MinLength(5, not_empty=True)
+        value = validators.Int(not_empty=True)
 
-    
-    @view_config(name="submit", route_url="/submit/", renderer="submit.html")
-    def submit(request):
+    class MyModel(object):
 
-        form = Form(request, BlogPostSchema)
+        pass
 
-        if form.validate():
+    class MyHandler(object):
 
-            post = BlogPost(title=form.data['title']
-                            content=form.data['content'])
+        @action(renderer='edit.html')
+        def edit(self):
 
-            # do whatever db persistence you need here
+            item_id = self.request.matchdict['item_id']
+            item = session.query(MyModel).get(item_id)
 
-            return HTTPFound(location="/")
+            form = Form(self.request, 
+                        schema=MyModelSchema, 
+                        obj=item)
 
-        return dict(form=form)
+            if form.validate():
+                
+                form.bind(item)
+               
+                # persist model somewhere...
+                return HTTPFound(location="/")
+
+            return dict(item=item, form=FormRenderer(form))
 
 
-The code is very simple. The **Form** instance is initialized with the request and your schema - it can be a **Schema** class or instance. The **validate** method does two things. First, it checks if the form should be validated (more of which in a moment) and if so it does the validation. It just returns a simple **True** or **False** depending on whether you are OK to continue or not. You can then access the validated data directly through the **data** property. If validation fails, the errors are dumped into the **errors** property.
+        @action(renderer='submit.html')
+        def submit(self):
+            
+            form = Form(self.request, 
+                        defaults={"name" : "..."})
+                        schema=MyModelSchema)
 
+            if form.validate():
+
+                obj = form.bind(MyModel())
+
+                # persist model somewhere...
+
+                return HTTPFound(location="/")
+
+        return dict(form=FormRenderer(form))
+
+The steps are:
+
+1. Create a **Form** instance with a Request and your schema and/or validators. You can optionally pass in default values or an object instance. 
+
+2. Call **validate()**. This will check if the form should be validated (in most cases, if the request method is HTTP POST), and validates against the provided schema. It returns **True** if the form has been validated and there are no errors. Any errors get dumped into the **errors** property as a dict. 
+
+3. If the form is valid, use **bind()** to bind the form fields to your object. If you would rather do this manually (or you don't have an object) you can access the validated data (as a dict) from the **data** property of the form.
+
+4. If the form hasn't been validated yet, or contains errors, pass it to your template. The form can optionally be wrapped in a **FormRenderer** which makes it easier to output individual HTML widgets.
+
+Validation
+----------
+
+The **validate()** method does two things. First, it checks if the form should be validated. Second, it performs the validation against your schema or validators. 
+
+By default, validation will run if the request method is HTTP POST. This is set by the `method` argument to the constructor.
 
 Working with models
 -------------------
 
-Whatever persistence system you use, **pyramid_simpleform** helps with the drudgery of moving values to and from your form and model.
+**pyramid_simpleform** makes it easier to work with your models (be they SQLAlchemy or ZODB models, or something else).
 
-The **bind()** method sets the properties of the object from the fields in your form. For example, the above view could be rewritten as::
+First, you can pass the `obj` argument to the constructor, which can be used instead of `defaults` to set default values in your form::
 
-    @view_config(name="submit", route_url="/submit/", renderer="submit.html")
-    def submit(request):
+    form = Form(request, MyModelSchema, obj=MyModel(name="foo"))
+    assert form.data['name'] == 'foo'
 
-        form = Form(request, BlogPostSchema)
+Second, the **bind()** method sets object properties from your form fields::
 
-        if form.validate():
+    if form.validate():
+        
+        obj = form.bind(MyModel())
 
-            post = form.bind(BlogPost())
-            # do whatever db persistence you need here
 
-            return HTTPFound(location="/")
-    
-    return dict(form=FormRenderer(form))
- 
-You can pass a couple of arguments, ``include`` and ``exclude`` to **bind()** to filter out any fields you explicitly don't want bound. This can of course be done in the schema using **filter_extra_fields** but sometimes it pays to be extra careful. For example, you don't
-want the "date_created" field to be overriden in the form::
+Some care should be taken when using **bind()**. You should ensure that your schema uses **filter_extra_fields** to remove any unused form fields (perhaps added by a malicious user) from the data. You can also use the parameters **include** and **exclude** to filter any unwanted data::
 
-    post = form.bind(BlogPost(), exclude=["date_created"])
+    if form.validate():
+        obj = form.bind(MyModel(), include=['name', 'value'])
 
-If you try to call **bind()** before running **validate()**, or if your form has errors, it will blow up with a **RuntimeError**.
-
-When you create your **Form** instance you can pass in ``obj`` rather than ``defaults``. While ``defaults`` expects a dict, the ``obj`` properties will be used to automatically pre-fill your form fields::
-
-    form = Form(request, schema=BlogPostSchema, obj=item)
-
-CSRF validation
----------------
+Note that running **bind()** on a form that hasn't been validated yet, or where the form contains errors, will raise a **RuntimeError**.
 
 Form rendering
 --------------
 
-You can render your form in any way you like: the **Form** class just provides the basic wrapper. It includes however an **htmlfill()** method to wrap the output content::
+Form rendering can be done completely manually if you wish, or using webhelpers, template macros, or other methods. The **FormRenderer** class contains some useful helper methods for outputting common form elements. It uses the WebHelpers library under the hood.
 
-    form = Form(request, BlogPostSchema)
-    return form.htmlfill(render_response("submit.html", dict(form=form)))
+The **Form** class also comes with an **htmlfill()** method which uses FormEncode **htmlfill** to render errors and defaults.
 
-However many people don't like htmlfill, and prefer to output default values, errors etc. manually (with the help of template macros and other helpers). 
+CSRF Validation
+---------------
 
-In either case, **pyramid_simpleform** comes with a **FormRenderer** class to help you output individual widgets. It uses the WebHelpers library under the hood. 
+**pyramid_simpleform** doesn't do CSRF validation: this is left up to you. One useful pattern is to use a **NewRequest** event to handle CSRF validation automatically::
 
-If you need to create special widgets (e.g. new HTML5 input types) just subclass **FormRenderer**.
+    def csrf_validation(event):
+
+        if event.request.method == "POST" and not event.request.is_xhr:
+            
+            token = event.request.POST.get("_csrf")
+            if token is None or token != event.request.session.get_csrf_token():
+                raise HTTPForbidden, "CSRF token is missing or invalid"
+
+However the **FormRenderer** class has a couple of helper methods for rendering the CSRF hidden input. **csrf()** just prints the input tag, while **csrf_token()** wraps the input in a hidden DIV to keep your markup valid.
+
+Remember to use the **allow_extra_fields** option with your schema to prevent validation errors caused by having the "_csrf" value (or other field values) in your form. A good tip is to create a base Schema class with **allow_extra_fields** and **filter_extra_fields** set to **True** and subclass this base Schema class with all your other schemas.
+
+API
+---
+
+.. module:: pyramid_simpleform
+
+.. autoclass:: Form
+   :members:
+    
+.. module:: pyramid_simpleform.renderers
+
+.. autoclass:: FormRenderer
+   :members:
 
 
-Custom renderers
-----------------
-
-The default **FormRenderer** should cover most cases, but you might want to do something a bit different - for example, adding some HTML5-specific widgets. To do this, first create your own renderer class::
-
-    from pyramid_simpleform import FormRenderer
-
-    class HTML5FormRenderer(FormRenderer):
-
-        def date(self, name, value=None, id=None, **attrs):
-            return self.input('search', name, value, id, **attrs)
-
-
-Then just use this class in place of FormRenderer::
-
-    renderer = HTML5FormRenderer(form)
-
-Other examples of renderers might be one that uses FormEncode's **htmlfill** library, or returns JSON. These are being considered for future versions.
-
-
-
+.. _Bitbucket: http://bitbucket.org/danjac/pyramid_simpleform
