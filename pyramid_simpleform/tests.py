@@ -289,6 +289,17 @@ class TestFormRenderer(unittest.TestCase):
 
         self.assert_(renderer.text("name") == \
                 '<input name="name" type="text" value="Fred" />')
+
+    def test_textarea(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.textarea("name") == \
+                '<textarea name="name">Fred</textarea>')
  
     def test_hidden(self):
         from pyramid_simpleform import Form
@@ -335,6 +346,19 @@ class TestFormRenderer(unittest.TestCase):
        
         self.assert_(renderer.file('file') == \
                    '<input name="file" type="file" />')
+
+    def test_password(self):
+  
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+       
+        self.assert_(renderer.password('password') == \
+                   '<input name="password" type="password" />')
+
 
     def test_radio(self):
 
