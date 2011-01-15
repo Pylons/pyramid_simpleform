@@ -144,6 +144,19 @@ Form rendering
 
 Form rendering can be done completely manually if you wish, or using webhelpers, template macros, or other methods. The **FormRenderer** class contains some useful helper methods for outputting common form elements. It uses the `WebHelpers`_ library under the hood.
 
+The widget methods automatically bind to the relevant field in the parent **Form** class. For example::
+
+    form = Form(request, MySchema, defaults={"name" : "foo"})
+    renderer = FormRenderer(form)
+
+If this is output using the "**text()** method of your renderer::
+
+    {{ renderer.text("name", size=30) }}
+
+will result in this HTML snippet::
+
+    <input type="text" name="name" id="name" value="foo" size="30" />
+
 The **Form** class also comes with an **htmlfill()** method which uses `FormEncode`_ **htmlfill** to render errors and defaults.
 
 CSRF Validation
