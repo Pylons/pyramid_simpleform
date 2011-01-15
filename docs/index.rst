@@ -143,7 +143,7 @@ The widget methods automatically bind to the relevant field in the parent **Form
     form = Form(request, MySchema, defaults={"name" : "foo"})
     renderer = FormRenderer(form)
 
-If this is output using the "**text()** method of your renderer::
+If this is output using the **text()** method of your renderer::
 
     {{ renderer.text("name", size=30) }}
 
