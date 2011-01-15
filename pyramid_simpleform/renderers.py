@@ -11,19 +11,15 @@ class FormRenderer(object):
     def __init__(self, form):
 
         self.form = form
-        self.request = self.form.request
-        self.data = self.form.data
-        self.errors = self.form.errors
-        self.multipart = self.form.multipart
 
     def value(self, name, default=None):
-        return self.data.get(name, default)
+        return self.form.data.get(name, default)
 
     def begin(self, url, **attrs):
         """
         Creates the opening <form> tags.
         """
-        return tags.form(url, multipart=self.multipart, **attrs)
+        return tags.form(url, multipart=self.form.multipart, **attrs)
 
     def end(self):
         """
@@ -36,9 +32,9 @@ class FormRenderer(object):
         Returns the CSRF hidden input. Creates new CSRF token
         if none has been assigned yet.
         """
-        token = self.request.session.get_csrf_token()
+        token = self.form.request.session.get_csrf_token()
         if token is None:
-            token = self.request.session.new_csrf_token()
+            token = self.form.request.session.new_csrf_token()
 
         return self.hidden("_csrf", value=token)
 
@@ -70,7 +66,7 @@ class FormRenderer(object):
         """
         Outputs radio input.
         """
-        checked = self.data.get(name) == value or checked
+        checked = self.form.data.get(name) == value or checked
         return tags.radio(name, value, checked, label, **attrs)
 
     def submit(self, name, value=None, id=None, **attrs):
@@ -105,6 +101,43 @@ class FormRenderer(object):
         Outputs a password input.
         """
         return tags.password(name, self.value(name, value), id, **attrs)
+
+    def is_error(self, name):
+        """
+        Shortcut for self.form.is_error(name)
+        """
+        return self.form.is_error(name)
+
+    def errors_for(self, name):
+        """
+        Shortcut for self.form.errors_for(name)
+        """
+        return self.form.errors_for(name)
+
+    def errorlist(self, name=None, **attrs):
+        """
+        Renders errors in a <ul> element. Unless specified in attrs, class
+        will be "error".
+
+        If no errors present returns an empty string.
+
+        `name` : errors for name. If **None** all errors will be rendered.
+        """
+
+        if name is None:
+            errors = self.form.errors.values()
+        else:
+            errors = self.errors_for(name)
+
+        if not errors:
+            return ''
+
+        content = "\n".join(HTML.tag("li", error) for error in errors)
+        
+        if 'class_' not in attrs:
+            attrs['class_'] = "error"
+
+        return HTML.tag("ul", tags.literal(content), **attrs)
 
     def label(self, name, label=None, **attrs):
         """

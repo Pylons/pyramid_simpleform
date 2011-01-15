@@ -401,6 +401,84 @@ class TestFormRenderer(unittest.TestCase):
                      '<input checked="checked" name="name" type="checkbox" '
                      'value="1" />')
 
+    def test_is_error(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+
+        self.assert_(not(form.validate()))
+
+        renderer = FormRenderer(form)
+        self.assert_(renderer.is_error('name'))
+
+    def test_errors_for(self):
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+
+        self.assert_(not(form.validate()))
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.errors_for('name') == ['Missing value'])
+
+    def test_errorlist(self):
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.validate()
+
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.errorlist() == \
+                     '<ul class="error"><li>Missing value</li></ul>')
+     
+
+    def test_errorlist_with_no_errors(self):
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST['name'] = 'test'
+
+        form = Form(request, SimpleSchema)
+        form.validate()
+
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.errorlist() == '')
+ 
+    def test_errorlist_with_field(self):
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.validate()
+
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.errorlist('name') == \
+                     '<ul class="error"><li>Missing value</li></ul>')
+ 
     def test_label(self):
 
         from pyramid_simpleform import Form
