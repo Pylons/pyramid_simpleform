@@ -15,12 +15,12 @@ requires = [
 
     
 setup(name='pyramid_simpleform',
-      version='0.1',
+      version='0.1.1',
       description='pyramid_simpleform',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
-        "Framework :: Pylons",
+        "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
