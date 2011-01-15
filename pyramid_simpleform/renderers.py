@@ -1,5 +1,4 @@
-import webhelpers.html.tags as h
-
+from webhelpers.html import tags
 from webhelpers.html.builder import HTML
 
 class FormRenderer(object):
@@ -23,13 +22,13 @@ class FormRenderer(object):
         """
         Creates the opening <form> tags.
         """
-        return h.form(action, multipart=self.multipart, **attrs)
+        return tags.form(action, multipart=self.multipart, **attrs)
 
     def end(self):
         """
         Closes the form.
         """
-        return h.end_form()
+        return tags.end_form()
     
     def csrf(self):
         """
@@ -59,7 +58,7 @@ class FormRenderer(object):
 
     def radio(self, name, value=None, checked=False, label=None, **attrs):
         checked = self.data.get(name) == value or checked
-        return tags.radio(name, self.value(name, value), checked, label, **attrs)
+        return tags.radio(name, value, checked, label, **attrs)
 
     def submit(self, name, value=None, id=None, **attrs):
         return tags.submit(name, self.value(name, value), id, **attrs)

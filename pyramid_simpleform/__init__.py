@@ -24,7 +24,7 @@ class Form(object):
     """
 
     def __init__(self, request, schema=None, validators=None, defaults=None, 
-                 obj=None, state=None, method="POST", variable_decode=True, 
+                 obj=None, state=None, method="POST", variable_decode=False, 
                  dict_char=".", list_char="-", multipart=False):
 
         self.request = request
@@ -56,7 +56,7 @@ class Form(object):
         """
         Checks if individual field has errors.
         """
-        return field is self.errors
+        return field in self.errors
 
     def errors_for(self, field):
         """
@@ -119,7 +119,7 @@ class Form(object):
                                                            self.state)
 
                 except Invalid, e:
-                    self.errors[field] = e
+                    self.errors[field] = unicode(e)
 
         self.is_validated = True
 

@@ -47,6 +47,27 @@ class TestForm(unittest.TestCase):
         self.assert_(form.errors_for('name') == ['Missing value'])
 
 
+    def test_validate_twice(self):
+        
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = {'name' : 'ok'}
+
+        form = Form(request, 
+                    validators=dict(name=validators.NotEmpty()))
+
+        self.assert_(form.validate())
+        self.assert_(form.is_validated)
+        self.assert_(form.data['name'] == 'ok')
+
+        request.POST = {'name' : 'ok again'}
+
+        self.assert_(form.validate())
+        self.assert_(form.is_validated)
+        self.assert_(form.data['name'] == 'ok')
+
     def test_validate_good_input_with_validators(self):
         from pyramid_simpleform import Form
 
@@ -74,7 +95,7 @@ class TestForm(unittest.TestCase):
         self.assert_(form.is_validated)
         self.assert_(form.is_error('name'))
 
-        self.assert_(form.errors_for('name') == ['Missing value'])
+        self.assert_(form.errors_for('name') == ['Please enter a value'])
 
     def test_is_validated_on_post(self):
         from pyramid_simpleform import Form
@@ -87,12 +108,6 @@ class TestForm(unittest.TestCase):
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
  
-    def test_validate_good_input(self):
-        assert False, "not implemented"
-
-    def test_validate_bad_input(self):
-        assert False, "not implemented"
-    
     def test_bind(self):
         from pyramid_simpleform import Form
 
@@ -127,11 +142,29 @@ class TestForm(unittest.TestCase):
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
 
     def test_bind_with_exclude(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST['name'] = 'test'
+
+        form = Form(request, SimpleSchema)
+        form.validate()
+        obj = form.bind(SimpleObj(), exclude=["name"])
+        self.assert_(obj.name == None)
  
     def test_bind_with_include(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
 
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST['name'] = 'test'
+
+        form = Form(request, SimpleSchema)
+        form.validate()
+        obj = form.bind(SimpleObj(), include=['foo'])
+        self.assert_(obj.name == None)
+ 
     def test_initialize_with_obj(self):
         from pyramid_simpleform import Form
 
@@ -141,17 +174,48 @@ class TestForm(unittest.TestCase):
         self.assert_(form.data['name'] == 'test')
 
     def test_initialize_with_defaults(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={'name' : 'test'})
+
+        self.assert_(form.data['name'] == 'test')
 
     def test_initialize_with_obj_and_defaults(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, 
+                    obj=SimpleObj(name='test1'),
+                    defaults={'name' : 'test2'})
+
+        self.assert_(form.data['name'] == 'test1')
 
     def test_variable_decode(self):
-        assert False, "not implemented"
-    
-    def test_validate_from_GET(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
 
+        request = testing.DummyRequest()
+        request.POST['name'] = 'test'
+        request.method = "POST"
+        
+        form = Form(request, SimpleSchema,
+                    variable_decode=True)
+
+        self.assert_(form.validate())
+        self.assert_(form.data['name'] == 'test')
+
+    def test_validate_from_GET(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "GET"
+        request.GET['name'] = 'test'
+
+        form = Form(request, SimpleSchema, method="GET")
+
+        self.assert_(form.validate())
+        self.assert_(form.is_validated)
+ 
     def test_htmlfill(self):
         from pyramid_simpleform import Form
 
@@ -171,36 +235,170 @@ class TestForm(unittest.TestCase):
 
 class TestFormRenderer(unittest.TestCase):
     
-    def test_render_form(self):
-        assert False, "not implemented"
+    def test_begin_form(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.begin(action="/"),
+                     '<form action="/" method="post">')
+
+    def test_end_form(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+       
+        self.assert_(renderer.end() == "</form>")
 
     def test_csrf(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
 
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.csrf() == \
+                '<input name="_csrf" type="hidden" value="csrft" />')
+ 
+    def test_csrf_token(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.csrf_token() == \
+                '<div style="display:none;"><input name="_csrf" '
+                'type="hidden" value="csrft" /></div>')
+ 
     def test_text(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
 
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.text("name") == \
+                '<input name="name" type="text" value="Fred" />')
+ 
     def test_hidden(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
 
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.hidden("name") == \
+                '<input name="name" type="hidden" value="Fred" />')
+        
     def test_select(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
 
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+        
+        options = [
+            ("Fred", "Fred"),
+            ("Barney", "Barney"),
+            ("Wilma", "Wilma"),
+            ("Betty", "Betty"),
+        ]   
+
+        self.assert_(renderer.select("name", options) == \
+            """<select name="name">
+<option selected="selected" value="Fred">Fred</option>
+<option value="Barney">Barney</option>
+<option value="Wilma">Wilma</option>
+<option value="Betty">Betty</option>
+</select>""")
+ 
     def test_file(self):
-        assert False, "not implemented"
+  
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+       
+        self.assert_(renderer.file('file') == \
+                   '<input name="file" type="file" />')
 
     def test_radio(self):
-        assert False, "not implemented"
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : 'Fred'})
+        renderer = FormRenderer(form)
+        
+        self.assert_(renderer.radio("name", value="Fred") == \
+                     '<input checked="checked" id="name_fred" name="name" '
+                     'type="radio" value="Fred" />')
+        
+        self.assert_(renderer.radio("name", value="Barney") == \
+                     '<input id="name_barney" name="name" '
+                     'type="radio" value="Barney" />')
 
     def test_submit(self):
-        assert False, "not implemented"
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.submit("submit", "Submit") == \
+                     '<input name="submit" type="submit" value="Submit" />')
 
     def test_checkbox(self):
-        assert False, "not implemented"
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={"name" : True})
+        renderer = FormRenderer(form)
+        
+        self.assert_(renderer.checkbox("name") == \
+                     '<input checked="checked" name="name" type="checkbox" '
+                     'value="1" />')
 
     def test_label(self):
-        assert False, "not implemented"
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+       
+        self.assert_(renderer.label("name") == \
+                   '<label for="name">Name</label>') 
 
     def test_label_using_field_name(self):
-        assert False, "not implemented"
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+       
+        self.assert_(renderer.label("name", "Your name") == \
+                   '<label for="name">Your name</label>') 
+
 
