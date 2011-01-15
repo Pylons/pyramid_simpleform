@@ -78,7 +78,7 @@ Here is a typical example::
 
 In your template (using `Jinja2`_ in this example)::
 
-    {{ renderer.begin(route_url("submit") }}
+    {{ renderer.begin(route_url("submit")) }}
     {{ renderer.csrf_token() }}
     <div class="field">
         {{ renderer.errorlist("name") }}
