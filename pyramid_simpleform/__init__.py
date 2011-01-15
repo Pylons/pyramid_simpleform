@@ -9,16 +9,21 @@ class Form(object):
     `request` : Pyramid request instance
 
     `schema`  : FormEncode Schema class or instance
+
     `validators` : a dict of FormEncode validators i.e. { field : validator }
 
     `defaults`   : a dict of default values
+
     `obj`        : instance of an object (e.g. SQLAlchemy model)
+
     `state`      : state passed to FormEncode validators.
 
     `method`        : HTTP method
 
     `variable_decode` : will decode dict/lists
+
     `dict_char`       : variabledecode dict char
+
     `list_char`       : variabledecode list char
 
     """
