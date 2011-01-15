@@ -1,7 +1,7 @@
 pyramid_simpleform
 ==================
 
-**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by Django forms, WTForms and Flatland. However it's also intended for use with the Pyramid framework and uses FormEncode for most of the heavy lifting. It's therefore assumed you are already familiar with FormEncode.
+**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by `Django forms`_, `WTForms`_ and `Flatland`_. However it's also intended for use with the `Pyramid`_ framework and uses `FormEncode`_ for most of the heavy lifting. It's therefore assumed you are already familiar with FormEncode.
 
 Installation
 ------------
@@ -76,7 +76,7 @@ Here is a typical example::
 
         return dict(renderer=FormRenderer(form))
 
-In your template (using Jinja2 in this example)::
+In your template (using `Jinja2`_ in this example)::
 
     {{ renderer.begin(route_url("submit") }}
     {{ renderer.csrf_token() }}
@@ -142,9 +142,9 @@ Note that running **bind()** on a form that hasn't been validated yet, or where 
 Form rendering
 --------------
 
-Form rendering can be done completely manually if you wish, or using webhelpers, template macros, or other methods. The **FormRenderer** class contains some useful helper methods for outputting common form elements. It uses the WebHelpers library under the hood.
+Form rendering can be done completely manually if you wish, or using webhelpers, template macros, or other methods. The **FormRenderer** class contains some useful helper methods for outputting common form elements. It uses the `WebHelpers`_ library under the hood.
 
-The **Form** class also comes with an **htmlfill()** method which uses FormEncode **htmlfill** to render errors and defaults.
+The **Form** class also comes with an **htmlfill()** method which uses `FormEncode`_ **htmlfill** to render errors and defaults.
 
 CSRF Validation
 ---------------
@@ -178,3 +178,10 @@ API
 
 
 .. _Bitbucket: http://bitbucket.org/danjac/pyramid_simpleform
+.. _Django forms: http://docs.djangoproject.com/en/dev/topics/forms/
+.. _WTForms: http://pypi.python.org/pypi/WTForms/
+.. _Flatland: http://pypi.python.org/pypi/flatland/
+.. _Jinja2: http://pypi.python.org/pypi/Jinja2/
+.. _FormEncode: http://pypi.python.org/pypi/FormEncode/
+.. _Pyramid: http://pypi.python.org/pypi/pyramid/
+.. _WebHelpers: http://pypi.python.org/pypi/WebHelpers/
