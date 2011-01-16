@@ -4,8 +4,12 @@ import sys
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+try:
+    README = open(os.path.join(here, 'README.txt')).read()
+    CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+except IOError:
+    README = CHANGES = ''
 
 requires = [
     'pyramid',
@@ -15,7 +19,7 @@ requires = [
 
     
 setup(name='pyramid_simpleform',
-      version='0.2.1',
+      version='0.2.2',
       description='pyramid_simpleform',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -31,6 +35,7 @@ setup(name='pyramid_simpleform',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      license="LICENSE.txt",
       install_requires=requires,
       tests_require=requires,
       test_suite="pyramid_simpleform",

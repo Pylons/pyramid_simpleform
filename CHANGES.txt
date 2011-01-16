@@ -1,1 +1,2 @@
-0.2: added errorlist and other error functions to FormRenderer
+0.1, 15/1/2011 -- initial release
+0.2, 16/1/2011 -- added errorlist and other error functions to FormRenderer
