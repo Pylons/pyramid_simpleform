@@ -1,3 +1,4 @@
+
 from webhelpers.html import tags
 from webhelpers.html.builder import HTML
 
@@ -11,9 +12,10 @@ class FormRenderer(object):
     def __init__(self, form):
 
         self.form = form
+        self.data = self.form.data
 
     def value(self, name, default=None):
-        return self.form.data.get(name, default)
+        return self.data.get(name, default)
 
     def begin(self, url, **attrs):
         """
@@ -66,7 +68,7 @@ class FormRenderer(object):
         """
         Outputs radio input.
         """
-        checked = self.form.data.get(name) == value or checked
+        checked = self.data.get(name) == value or checked
         return tags.radio(name, value, checked, label, **attrs)
 
     def submit(self, name, value=None, id=None, **attrs):

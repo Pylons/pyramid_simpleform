@@ -2,6 +2,7 @@ from formencode import htmlfill
 from formencode import variabledecode
 from formencode import Invalid
 
+from pyramid.renderers import render
 
 class Form(object):
 
@@ -177,3 +178,40 @@ class Form(object):
                                errors=self.errors,
                                **htmlfill_kwargs)
 
+    def render(self, template, extra_info=None, htmlfill=True,
+              **htmlfill_kwargs):
+        """
+        Renders the form directly to a template,
+        using Pyramid's **render** function. 
+
+        `template` : name of template
+        `extra_info` : dict of extra data to pass to template
+        `htmlfill` : run htmlfill on the result.
+
+        By default the form itself will be passed in as `form`.
+
+        htmlfill is automatically run on the result of render if
+        `htmlfill` is **True**.
+
+        This is useful if you want to use htmlfill on a form,
+        but still return a dict from a view. For example::
+
+            @view_config(name='submit', request_method='POST')
+            def submit(request):
+
+                form = Form(request, MySchema)
+                if form.validate():
+                    # do something
+                return dict(form=form.render("my_form.html"))
+
+        """
+        
+        extra_info = extra_info or {}
+        extra_info.setdefault('form', self)
+
+        print "rendering form..."
+
+        result = render(template, extra_info, self.request)
+        if htmlfill:
+            result = self.htmlfill(result, **htmlfill_kwargs)
+        return result

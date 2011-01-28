@@ -216,6 +216,58 @@ class TestForm(unittest.TestCase):
         self.assert_(form.validate())
         self.assert_(form.is_validated)
  
+    def test_render_without_htmlfill(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.POST['name'] = 'test'
+        request.method = "POST"
+        
+        settings = {}
+
+        settings['mako.directories'] = 'pyramid_simpleform:templates'
+        config = Configurator(settings=settings)
+
+
+        config.add_renderer('.html', 
+                            'pyramid.mako_templating.renderer_factory')
+
+        request.registry = config.registry
+
+        form = Form(request, SimpleSchema)
+
+        result = form.render("test_form.html", htmlfill=False)
+        self.assert_('<input type="text" name="name" size="20">' 
+                     in result)
+
+
+    def test_render_with_htmlfill(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.POST['name'] = 'test'
+        request.method = "POST"
+        
+        settings = {}
+
+        settings['mako.directories'] = 'pyramid_simpleform:templates'
+        config = Configurator(settings=settings)
+
+
+        config.add_renderer('.html', 
+                            'pyramid.mako_templating.renderer_factory')
+
+        request.registry = config.registry
+
+        form = Form(request, SimpleSchema, defaults={'name' : 'foo'})
+
+        result = form.render("test_form.html", htmlfill=True)
+        self.assert_('<input type="text" name="name" size="20" value="foo">' 
+                     in result)
+
+
     def test_htmlfill(self):
         from pyramid_simpleform import Form
 
@@ -502,5 +554,7 @@ class TestFormRenderer(unittest.TestCase):
        
         self.assert_(renderer.label("name", "Your name") == \
                    '<label for="name">Your name</label>') 
+
+
 
 
