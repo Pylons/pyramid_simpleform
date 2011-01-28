@@ -209,8 +209,6 @@ class Form(object):
         extra_info = extra_info or {}
         extra_info.setdefault('form', self)
 
-        print "rendering form..."
-
         result = render(template, extra_info, self.request)
         if htmlfill:
             result = self.htmlfill(result, **htmlfill_kwargs)
