@@ -185,7 +185,9 @@ class Form(object):
         using Pyramid's **render** function. 
 
         `template` : name of template
+
         `extra_info` : dict of extra data to pass to template
+
         `htmlfill` : run htmlfill on the result.
 
         By default the form itself will be passed in as `form`.

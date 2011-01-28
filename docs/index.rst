@@ -19,7 +19,7 @@ Getting started
 
 Here is a typical example::
 
-    from pyramid.view import action
+    from pyramid.view import view_config
     from validators import Schema, validators
 
     from pyramid_simpleform import Form
@@ -37,44 +37,44 @@ Here is a typical example::
 
         pass
 
-    class MyHandler(object):
 
-        @action(renderer='edit.html')
-        def edit(self):
+    @view_config(renderer='edit.html')
+    def edit(self):
 
-            item_id = self.request.matchdict['item_id']
-            item = session.query(MyModel).get(item_id)
+        item_id = self.request.matchdict['item_id']
+        item = session.query(MyModel).get(item_id)
 
-            form = Form(self.request, 
-                        schema=MyModelSchema, 
-                        obj=item)
+        form = Form(self.request, 
+                    schema=MyModelSchema, 
+                    obj=item)
 
-            if form.validate():
-                
-                form.bind(item)
-               
-                # persist model somewhere...
-                return HTTPFound(location="/")
-
-            return dict(item=item, form=FormRenderer(form))
-
-
-        @action(renderer='submit.html')
-        def submit(self):
+        if form.validate():
             
-            form = Form(self.request, 
-                        defaults={"name" : "..."})
-                        schema=MyModelSchema)
+            form.bind(item)
+           
+            # persist model somewhere...
+            return HTTPFound(location="/")
 
-            if form.validate():
+        return dict(item=item, form=FormRenderer(form))
 
-                obj = form.bind(MyModel())
 
-                # persist model somewhere...
+    @view_config(renderer='submit.html')
+    def submit(self):
+        
+        form = Form(self.request, 
+                    defaults={"name" : "..."})
+                    schema=MyModelSchema)
 
-                return HTTPFound(location="/")
+        if form.validate():
 
-        return dict(renderer=FormRenderer(form))
+            obj = form.bind(MyModel())
+
+            # persist model somewhere...
+
+            return HTTPFound(location="/")
+
+    return dict(renderer=FormRenderer(form))
+
 
 In your template (using `Jinja2`_ in this example)::
 
