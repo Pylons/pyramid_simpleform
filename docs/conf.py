@@ -76,7 +76,7 @@ copyright = '%s, Dan Jacob' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.1'
+version = '0.3'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -335,7 +335,7 @@ latex_elements = {
     'wrapperclass':'book',
     'date':'',
     'releasename':'Version',
-    'title':r'The Pyramid Web Application \newline Development Framework',
+    'title':r'pyramid_simpleform',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
@@ -435,10 +435,9 @@ def resig(app, what, name, obj, options, signature, return_annotation):
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
-epub_author = 'Chris McDonough'
-epub_publisher = 'Agendaless Consulting'
-epub_copyright = '2008-2011'
+epub_title = 'pyramid_simpleform'
+epub_author = 'Dan Jacob'
+epub_copyright = '2010-2011'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
@@ -449,10 +448,9 @@ epub_scheme = 'ISBN'
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
-epub_identifier = '0615345379'
 
 # A unique identification for the text.
-epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
+epub_uid = 'pyramid_simpleform'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

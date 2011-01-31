@@ -9,10 +9,11 @@ class FormRenderer(object):
     on individual widgets.
     """
 
-    def __init__(self, form):
+    def __init__(self, form, csrf_field='_csrf'):
 
         self.form = form
         self.data = self.form.data
+        self.csrf_field = csrf_field
 
     def value(self, name, default=None):
         return self.data.get(name, default)
@@ -38,7 +39,7 @@ class FormRenderer(object):
         if token is None:
             token = self.form.request.session.new_csrf_token()
 
-        return self.hidden("_csrf", value=token)
+        return self.hidden(self.csrf_field, value=token)
 
     def csrf_token(self):
         """
