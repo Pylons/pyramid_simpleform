@@ -38,7 +38,8 @@ Here is a typical example::
         pass
 
 
-    @view_config(renderer='edit.html')
+    @view_config(name='edit',
+                 renderer='edit.html')
     def edit(self):
 
         item_id = self.request.matchdict['item_id']
@@ -58,8 +59,9 @@ Here is a typical example::
         return dict(item=item, form=FormRenderer(form))
 
 
-    @view_config(renderer='submit.html')
-    def submit(self):
+    @view_config(name='add',
+                 renderer='submit.html')
+    def add(self):
         
         form = Form(self.request, 
                     defaults={"name" : "..."})
@@ -76,19 +78,19 @@ Here is a typical example::
     return dict(renderer=FormRenderer(form))
 
 
-In your template (using `Jinja2`_ in this example)::
+In your template (using a Mako template in this example)::
 
-    {{ renderer.begin(route_url("submit")) }}
-    {{ renderer.csrf_token() }}
+    ${renderer.begin(request.resource_url(request.root, 'add'))}
+    ${renderer.csrf_token()}
     <div class="field">
-        {{ renderer.errorlist("name") }}
-        {{ renderer.text("name", size=30)
+        ${renderer.errorlist("name")}
+        ${renderer.text("name", size=30)}
     </div>
     ....
     <div class="buttons">
-        {{ renderer.submit("submit", "Submit") }}
+        ${renderer.submit("submit", "Submit")}
     </div>
-    {{ renderer.end() }}
+    ${renderer.end()}
 
 The steps are:
 
@@ -145,7 +147,7 @@ The widget methods automatically bind to the relevant field in the parent **Form
 
 If this is output using the **text()** method of your renderer::
 
-    {{ renderer.text("name", size=30) }}
+    ${renderer.text("name", size=30)}
 
 will result in this HTML snippet::
 
@@ -188,7 +190,6 @@ API
 .. _Django forms: http://docs.djangoproject.com/en/dev/topics/forms/
 .. _WTForms: http://pypi.python.org/pypi/WTForms/
 .. _Flatland: http://pypi.python.org/pypi/flatland/
-.. _Jinja2: http://pypi.python.org/pypi/Jinja2/
 .. _FormEncode: http://pypi.python.org/pypi/FormEncode/
 .. _Pyramid: http://pypi.python.org/pypi/pyramid/
 .. _WebHelpers: http://pypi.python.org/pypi/WebHelpers/

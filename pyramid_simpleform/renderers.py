@@ -34,6 +34,8 @@ class FormRenderer(object):
         """
         Returns the CSRF hidden input. Creates new CSRF token
         if none has been assigned yet.
+
+        The name of the hidden field is **_csrf** by default.
         """
         token = self.form.request.session.get_csrf_token()
         if token is None:
