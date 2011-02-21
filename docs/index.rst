@@ -153,6 +153,8 @@ will result in this HTML snippet::
 
     <input type="text" name="name" id="name" value="foo" size="30" />
 
+It is expected that you will want to subclass **FormRenderer**, for example you might wish to generate custom fields with JavaScript, HTML5 fields, and so on.
+
 The **Form** class also comes with an **htmlfill()** method which uses `FormEncode`_ **htmlfill** to render errors and defaults.
 
 Localization and state
