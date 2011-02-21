@@ -55,10 +55,12 @@ class FormRenderer(object):
         """
         return HTML.tag("div", self.csrf(name), style="display:none;")
 
-    def hidden_tag(self, *names, **options):
+    def hidden_tag(self, *names):
         """
         Convenience for printing all hidden fields in a form inside a 
         hidden DIV. Will also render the CSRF hidden field.
+
+        :versionadded: 0.4
         """
         inputs = [self.hidden(name) for name in names]
         inputs.append(self.csrf())
