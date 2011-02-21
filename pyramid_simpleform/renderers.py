@@ -18,11 +18,15 @@ class FormRenderer(object):
     def value(self, name, default=None):
         return self.data.get(name, default)
 
-    def begin(self, url, **attrs):
+    def begin(self, url=None, **attrs):
         """
         Creates the opening <form> tags.
+
+        By default URL will be current path.
         """
-        return tags.form(url, multipart=self.form.multipart, **attrs)
+        url = url or self.form.request.path
+        multipart = attrs.pop('multipart', self.form.multipart)
+        return tags.form(url, multipart=multipart, **attrs)
 
     def end(self):
         """
@@ -30,24 +34,37 @@ class FormRenderer(object):
         """
         return tags.end_form()
     
-    def csrf(self):
+    def csrf(self, name=None):
         """
         Returns the CSRF hidden input. Creates new CSRF token
         if none has been assigned yet.
 
         The name of the hidden field is **_csrf** by default.
         """
+        name = name or self.csrf_field
+
         token = self.form.request.session.get_csrf_token()
         if token is None:
             token = self.form.request.session.new_csrf_token()
 
-        return self.hidden(self.csrf_field, value=token)
+        return self.hidden(name, value=token)
 
-    def csrf_token(self):
+    def csrf_token(self, name=None):
         """
         Convenience function. Returns CSRF hidden tag inside hidden DIV.
         """
-        return HTML.tag("div", self.csrf(), style="display:none;")
+        return HTML.tag("div", self.csrf(name), style="display:none;")
+
+    def hidden_tag(self, *names, **options):
+        """
+        Convenience for printing all hidden fields in a form inside a 
+        hidden DIV. Will also render the CSRF hidden field.
+        """
+        inputs = [self.hidden(name) for name in names]
+        inputs.append(self.csrf())
+        return HTML.tag("div", 
+                        tags.literal("".join(inputs)), 
+                        style="display:none;")
 
     def text(self, name, value=None, id=None, **attrs):
         """
@@ -156,6 +173,4 @@ class FormRenderer(object):
             attrs['for_'] = name
         label = label or name.capitalize()
         return HTML.tag("label", label, **attrs)
-        
-
 

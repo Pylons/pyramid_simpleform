@@ -162,7 +162,7 @@ CSRF Validation
 
     def csrf_validation(event):
 
-        if event.request.method == "POST" and not event.request.is_xhr:
+        if event.request.method == "POST":
             
             token = event.request.POST.get("_csrf")
             if token is None or token != event.request.session.get_csrf_token():

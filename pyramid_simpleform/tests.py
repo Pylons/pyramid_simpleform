@@ -46,7 +46,6 @@ class TestForm(unittest.TestCase):
 
         self.assert_(form.errors_for('name') == ['Missing value'])
 
-
     def test_validate_twice(self):
         
         from pyramid_simpleform import Form
@@ -330,6 +329,37 @@ class TestFormRenderer(unittest.TestCase):
         self.assert_(renderer.csrf_token() == \
                 '<div style="display:none;"><input name="_csrf" '
                 'type="hidden" value="csrft" /></div>')
+
+    def test_hidden_tag_with_csrf_and_other_names(self):
+        
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema, defaults={'name':'foo'})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.hidden_tag('name') == \
+            '<div style="display:none;"><input name="name" type="hidden" '
+            'value="foo" /><input name="_csrf" type="hidden" value="csrft" />'
+            '</div>')
+
+    def test_hidden_tag_with_just_csrf(self):
+        
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleSchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.hidden_tag() == \
+                '<div style="display:none;"><input name="_csrf" '
+                'type="hidden" value="csrft" /></div>')
+
+
+ 
+ 
  
     def test_text(self):
         from pyramid_simpleform import Form
@@ -554,7 +584,4 @@ class TestFormRenderer(unittest.TestCase):
        
         self.assert_(renderer.label("name", "Your name") == \
                    '<label for="name">Your name</label>') 
-
-
-
 
