@@ -128,15 +128,21 @@ class FormRenderer(object):
 
     def is_error(self, name):
         """
-        Shortcut for self.form.is_error(name)
+        Shortcut for **self.form.is_error(name)**
         """
         return self.form.is_error(name)
 
     def errors_for(self, name):
         """
-        Shortcut for self.form.errors_for(name)
+        Shortcut for **self.form.errors_for(name)**
         """
         return self.form.errors_for(name)
+
+    def all_errors(self):
+        """
+        Shortcut for **self.form.all_errors()**
+        """
+        return self.form.all_errors()
 
     def errorlist(self, name=None, **attrs):
         """
@@ -149,7 +155,7 @@ class FormRenderer(object):
         """
 
         if name is None:
-            errors = self.form.errors.values()
+            errors = self.all_errors()
         else:
             errors = self.errors_for(name)
 

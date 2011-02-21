@@ -20,6 +20,12 @@ class SimpleObj(object):
 
 class TestForm(unittest.TestCase):
     
+    def test_state(self):
+
+        from pyramid_simpleform import State
+        obj = State(foo="bar")
+        self.assert_(obj.foo=="bar")
+
     def test_is_error(self):
         from pyramid_simpleform import Form
 
@@ -31,6 +37,42 @@ class TestForm(unittest.TestCase):
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
         self.assert_('name' in form.errors)
+
+    def test_all_errors_with_single_string(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.errors = u"Name is missing"
+        self.assert_(form.all_errors() == [u"Name is missing"])
+
+    def test_all_errors_with_list(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.errors = [u"Name is missing"]
+        self.assert_(form.all_errors() == [u"Name is missing"])
+
+    def test_all_errors_with_dict(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.errors = {"name" : [u"Name is missing"],
+                       "value" : u"Value is missing"}
+        self.assert_(form.all_errors() == [
+            u"Name is missing", 
+            u"Value is missing"])
 
     def test_errors_for(self):
         from pyramid_simpleform import Form
@@ -544,6 +586,26 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.errorlist() == '')
+
+    def test_errorlist_with_custom_localizer(self):
+
+        from pyramid_simpleform import Form
+        from pyramid_simpleform import State
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        state = State(_=lambda s:s.upper())
+
+        form = Form(request, SimpleSchema, state=state)
+        form.validate()
+
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.errorlist('name') == \
+                     '<ul class="error"><li>MISSING VALUE</li></ul>')
+ 
  
     def test_errorlist_with_field(self):
 

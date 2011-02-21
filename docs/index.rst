@@ -155,6 +155,21 @@ will result in this HTML snippet::
 
 The **Form** class also comes with an **htmlfill()** method which uses `FormEncode`_ **htmlfill** to render errors and defaults.
 
+Localization and state
+----------------------
+
+FormEncode provides a way to manage localized error messages, detailed `here <http://formencode.org/Validator.html#localization-of-error-messages-i18n>`_. 
+
+If you pass a "state" object to the validation process, FormEncode will check for a "_" gettext function in the state object and use that to localize error messages. To make the process easier, **pyramid_simpleform** uses a "dummy" **State** object if you don't provide the ``state`` argument yourself. You can use this **State** object directly if you wish::
+
+    from pyramid_simpleform import State
+
+    form = Form(request, MySchema, state=State(my_obj=MyObject())
+    # you can access my_obj as state.my_obj in your validators
+
+Whether you provide your own ``state`` argument or not, **pyramid_simpleform** will check for a "_" method. If this is not present then it will set "_" as the default the `translate <http://docs.pylonsproject.org/projects/pyramid/dev/api/i18n.html>`_  method provided with Pyramid's **Localizer** object. As the current request is available to your **Form** instance, this is used to obtain the correct localizer instance for your request.
+
+
 CSRF Validation
 ---------------
 
@@ -178,6 +193,9 @@ API
 .. module:: pyramid_simpleform
 
 .. autoclass:: Form
+   :members:
+   
+.. autoclass:: State
    :members:
     
 .. module:: pyramid_simpleform.renderers

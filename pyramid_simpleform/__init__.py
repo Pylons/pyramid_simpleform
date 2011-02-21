@@ -2,9 +2,27 @@ from formencode import htmlfill
 from formencode import variabledecode
 from formencode import Invalid
 
+from pyramid.i18n import get_localizer
 from pyramid.renderers import render
 
+class State(object):
+    """
+    Default "empty" state object.
+
+    Keyword arguments are automatically bound to properties, for
+    example::
+
+        obj = State(foo="bar")
+        obj.foo == "bar"
+    """
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+
 class Form(object):
+
 
     """
     `request` : Pyramid request instance
@@ -29,6 +47,8 @@ class Form(object):
 
     """
 
+    default_state = State
+
     def __init__(self, request, schema=None, validators=None, defaults=None, 
                  obj=None, state=None, method="POST", variable_decode=False, 
                  dict_char=".", list_char="-", multipart=False):
@@ -48,12 +68,17 @@ class Form(object):
         self.errors = {}
         self.data = {}
 
+        if self.state is None:
+            self.state = self.default_state()
+
+        if not hasattr(self.state, '_'):
+            self.state._ = get_localizer(self.request).translate
+
         if defaults:
             self.data.update(defaults)
 
         if obj:
             self.data.update(obj.__dict__)
-
 
         assert self.schema or self.validators, \
                 "validators and/or schema required"
@@ -63,6 +88,19 @@ class Form(object):
         Checks if individual field has errors.
         """
         return field in self.errors
+
+    def all_errors(self):
+        """
+        Returns all errors in a single list.
+        """
+        if isinstance(self.errors, basestring):
+            return [self.errors]
+        if isinstance(self.errors, list):
+            return self.errors
+        errors = []
+        for field in self.errors.iterkeys():
+            errors += self.errors_for(field)
+        return errors
 
     def errors_for(self, field):
         """
@@ -116,7 +154,6 @@ class Form(object):
                 self.errors = e.unpack_errors(self.variable_decode,
                                               self.dict_char,
                                               self.list_char)
-
 
         if self.validators:
             for field, validator in self.validators.iteritems():
