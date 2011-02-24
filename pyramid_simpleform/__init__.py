@@ -95,9 +95,6 @@ class Form(object):
         if obj:
             self.data.update(obj.__dict__)
 
-        assert self.schema or self.validators, \
-                "validators and/or schema required"
-
     def is_error(self, field):
         """
         Checks if individual field has errors.
@@ -141,6 +138,9 @@ class Form(object):
         The errors and data values will be updated accordingly.
 
         """
+
+        assert self.schema or self.validators, \
+                "validators and/or schema required"
 
         if self.is_validated:
             return not(self.errors)

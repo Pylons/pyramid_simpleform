@@ -72,18 +72,21 @@ class FormRenderer(object):
         """
         Outputs text input.
         """
+        id = id or name
         return tags.text(name, self.value(name, value), id, **attrs)
 
     def file(self, name, value=None, id=None, **attrs):
         """
         Outputs file input.
         """
+        id = id or name
         return tags.file(name, self.value(name, value), id, **attrs)
 
     def hidden(self, name, value=None, id=None, **attrs):
         """
         Outputs hidden input.
         """
+        id = id or name
         return tags.hidden(name, self.value(name, value), id, **attrs)
 
     def radio(self, name, value=None, checked=False, label=None, **attrs):
@@ -97,12 +100,14 @@ class FormRenderer(object):
         """
         Outputs submit button.
         """
+        id = id or name
         return tags.submit(name, self.value(name, value), id, **attrs)
 
     def select(self, name, options, selected_value=None, id=None, **attrs):
         """
         Outputs <select> element.
         """
+        id = id or name
         return tags.select(name, self.value(name, selected_value), 
                            options, id, **attrs)
 
@@ -112,18 +117,21 @@ class FormRenderer(object):
         Outputs checkbox input.
         """
     
+        id = id or name
         return tags.checkbox(name, value, self.value(name), label, id, **attrs)
 
     def textarea(self, name, content="", id=None, **attrs):
         """
         Outputs <textarea> element.
         """
+        id = id or name
         return tags.textarea(name, self.value(name, content), id, **attrs)
 
     def password(self, name, value=None, id=None, **attrs):
         """
         Outputs a password input.
         """
+        id = id or name
         return tags.password(name, self.value(name, value), id, **attrs)
 
     def is_error(self, name):
