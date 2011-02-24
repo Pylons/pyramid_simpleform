@@ -17,14 +17,50 @@ class SimpleObj(object):
     def __init__(self, name=None):
         self.name = name
 
+class TestState(unittest.TestCase):
 
-class TestForm(unittest.TestCase):
-    
     def test_state(self):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
         self.assert_(obj.foo=="bar")
+
+    def test_state_contains(self):
+
+        from pyramid_simpleform import State
+        obj = State(foo="bar")
+        self.assert_("foo" in obj)
+
+    def test_state_not_contains(self):
+
+        from pyramid_simpleform import State
+        obj = State(foo="bar")
+        self.assert_("bar" not in obj)
+
+    def test_getitem(self):
+
+        from pyramid_simpleform import State
+        obj = State(foo="bar")
+        self.assert_(obj['foo'] == 'bar')
+
+    def test_setitem(self):
+
+        from pyramid_simpleform import State
+        obj = State()
+        obj['foo'] = "bar"
+        self.assert_(obj['foo'] == 'bar')
+        self.assert_(obj.foo == 'bar')
+
+    def test_get(self):
+
+        from pyramid_simpleform import State
+        obj = State(foo="bar")
+        self.assert_(obj.get('foo') == 'bar')
+        self.assert_(obj.get('bar', 'foo') == 'foo')
+
+
+class TestForm(unittest.TestCase):
+    
 
     def test_is_error(self):
         from pyramid_simpleform import Form

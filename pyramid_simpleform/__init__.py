@@ -20,6 +20,21 @@ class State(object):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def __contains__(self, k):
+        return hasattr(self, k)
+
+    def __getitem__(self, k):
+        try:
+            return getattr(self, k)
+        except AttributeError:
+            raise KeyError
+
+    def __setitem__(self, k, v):
+        setattr(self, k, v)
+
+    def get(self, k, default=None):
+        return getattr(self, k, default)
+
 
 class Form(object):
 
