@@ -394,7 +394,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.csrf() == \
-                '<input name="_csrf" type="hidden" value="csrft" />')
+            '<input id="_csrf" name="_csrf" type="hidden" value="csrft" />')
  
     def test_csrf_token(self):
         from pyramid_simpleform import Form
@@ -405,7 +405,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.csrf_token() == \
-                '<div style="display:none;"><input name="_csrf" '
+                '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="csrft" /></div>')
 
     def test_hidden_tag_with_csrf_and_other_names(self):
@@ -418,9 +418,9 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.hidden_tag('name') == \
-            '<div style="display:none;"><input name="name" type="hidden" '
-            'value="foo" /><input name="_csrf" type="hidden" value="csrft" />'
-            '</div>')
+            '<div style="display:none;"><input id="name" name="name" '
+            'type="hidden" value="foo" /><input id="_csrf" name="_csrf" '
+            'type="hidden" value="csrft" /></div>')
 
     def test_hidden_tag_with_just_csrf(self):
         
@@ -432,7 +432,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.hidden_tag() == \
-                '<div style="display:none;"><input name="_csrf" '
+                '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="csrft" /></div>')
 
 
@@ -448,7 +448,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.text("name") == \
-                '<input name="name" type="text" value="Fred" />')
+                '<input id="name" name="name" type="text" value="Fred" />')
 
     def test_textarea(self):
         from pyramid_simpleform import Form
@@ -459,7 +459,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.textarea("name") == \
-                '<textarea name="name">Fred</textarea>')
+                '<textarea id="name" name="name">Fred</textarea>')
  
     def test_hidden(self):
         from pyramid_simpleform import Form
@@ -470,7 +470,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.hidden("name") == \
-                '<input name="name" type="hidden" value="Fred" />')
+                '<input id="name" name="name" type="hidden" value="Fred" />')
         
     def test_select(self):
         from pyramid_simpleform import Form
@@ -488,7 +488,7 @@ class TestFormRenderer(unittest.TestCase):
         ]   
 
         self.assert_(renderer.select("name", options) == \
-            """<select name="name">
+            """<select id="name" name="name">
 <option selected="selected" value="Fred">Fred</option>
 <option value="Barney">Barney</option>
 <option value="Wilma">Wilma</option>
@@ -505,7 +505,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
        
         self.assert_(renderer.file('file') == \
-                   '<input name="file" type="file" />')
+                   '<input id="file" name="file" type="file" />')
 
     def test_password(self):
   
@@ -517,7 +517,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
        
         self.assert_(renderer.password('password') == \
-                   '<input name="password" type="password" />')
+                   '<input id="password" name="password" type="password" />')
 
 
     def test_radio(self):
@@ -547,7 +547,7 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         self.assert_(renderer.submit("submit", "Submit") == \
-                     '<input name="submit" type="submit" value="Submit" />')
+            '<input id="submit" name="submit" type="submit" value="Submit" />')
 
     def test_checkbox(self):
         from pyramid_simpleform import Form
@@ -558,8 +558,8 @@ class TestFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
         
         self.assert_(renderer.checkbox("name") == \
-                     '<input checked="checked" name="name" type="checkbox" '
-                     'value="1" />')
+            '<input checked="checked" id="name" name="name" type="checkbox" '
+            'value="1" />')
 
     def test_is_error(self):
         from pyramid_simpleform import Form
