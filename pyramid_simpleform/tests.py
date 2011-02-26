@@ -196,6 +196,26 @@ class TestForm(unittest.TestCase):
         form.validate()
         obj = form.bind(SimpleObj())
         self.assert_(obj.name == 'test')
+
+    def test_bind_ignore_underscores(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST['name'] = 'test'
+        request.POST['_ignoreme'] = 'test'
+
+        class SimpleObjWithPrivate(SimpleObj):
+            _ignoreme = None
+
+        class SimpleSchemaWithPrivate(SimpleSchema):
+            _ignoreme = validators.String()
+
+        form = Form(request, SimpleSchemaWithPrivate)
+        form.validate()
+        obj = form.bind(SimpleObjWithPrivate())
+        self.assert_(obj.name == 'test')
+        self.assert_(obj._ignoreme is None)
         
     def test_bind_not_validated_yet(self):
         from pyramid_simpleform import Form

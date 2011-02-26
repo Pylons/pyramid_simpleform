@@ -135,6 +135,8 @@ Some care should be taken when using **bind()**. You should ensure that your sch
 
 Note that running **bind()** on a form that hasn't been validated yet, or where the form contains errors, will raise a **RuntimeError**.
 
+Also note that attributes starting with an underscore will not be explicitly bound. In order to bind such properties you must do so manually from the ``data`` property of your form instance.
+
 Form rendering
 --------------
 

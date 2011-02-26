@@ -60,17 +60,21 @@ class Form(object):
 
     `list_char`       : variabledecode list char
 
+    Also note that values of ``obj`` supercede those of ``defaults``. Only
+    fields specified in your schema or validators will be taken from the 
+    object.
     """
 
     default_state = State
 
     def __init__(self, request, schema=None, validators=None, defaults=None, 
-                 obj=None, state=None, method="POST", variable_decode=False, 
-                 dict_char=".", list_char="-", multipart=False):
+                 obj=None, extra=None, include=None, exclude=None, state=None, 
+                 method="POST", variable_decode=False,  dict_char=".", 
+                 list_char="-", multipart=False):
 
         self.request = request
         self.schema = schema
-        self.validators = validators
+        self.validators = validators or {}
         self.method = method
         self.variable_decode = variable_decode
         self.dict_char = dict_char
@@ -93,7 +97,10 @@ class Form(object):
             self.data.update(defaults)
 
         if obj:
-            self.data.update(obj.__dict__)
+            fields = self.schema.fields.keys() + self.validators.keys() 
+            for f in fields:
+                if hasattr(obj, f):
+                    self.data[f] = getattr(obj, f) 
 
     def is_error(self, field):
         """
@@ -196,6 +203,10 @@ class Form(object):
 
         Returns the `obj` passed in.
 
+        Note that any properties starting with underscore "_" are ignored
+        regardless of ``include`` and ``exclude``. If you need to set these
+        do so manually from the ``data`` property of the form instance.
+
         Calling bind() before running validate() will result in a RuntimeError
         """
 
@@ -206,7 +217,8 @@ class Form(object):
         if self.errors:
             raise RuntimeError, "Cannot bind to object if form has errors"
 
-        for k, v in self.data.items():
+        items = [(k, v) for k, v in self.data.items() if not k.startswith("_")]
+        for k, v in items:
 
             if include and k not in include:
                 continue
