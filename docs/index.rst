@@ -20,7 +20,7 @@ Getting started
 Here is a typical example::
 
     from pyramid.view import view_config
-    from validators import Schema, validators
+    from formencode import Schema, validators
 
     from pyramid_simpleform import Form
     from pyramid_simpleform.renderers import FormRenderer
@@ -64,7 +64,7 @@ Here is a typical example::
     def add(self):
         
         form = Form(self.request, 
-                    defaults={"name" : "..."})
+                    defaults={"name" : "..."},
                     schema=MyModelSchema)
 
         if form.validate():
@@ -75,7 +75,7 @@ Here is a typical example::
 
             return HTTPFound(location="/")
 
-    return dict(renderer=FormRenderer(form))
+        return dict(renderer=FormRenderer(form))
 
 
 In your template (using a Mako template in this example)::
