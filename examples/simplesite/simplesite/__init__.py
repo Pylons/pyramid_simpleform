@@ -11,6 +11,8 @@ def main(global_config, **settings):
     """
     config = Configurator(settings=settings)
 
+    config.include('pyramid_handlers')
+
     # Initialize database
     engine = pyramid_sqla.add_engine(settings, prefix='sqlalchemy.')
     initialize_sql(engine)
