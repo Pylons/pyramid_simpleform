@@ -42,10 +42,10 @@ Here is a typical example::
                  renderer='edit.html')
     def edit(self):
 
-        item_id = self.request.matchdict['item_id']
+        item_id = request.matchdict['item_id']
         item = session.query(MyModel).get(item_id)
 
-        form = Form(self.request, 
+        form = Form(request, 
                     schema=MyModelSchema, 
                     obj=item)
 
@@ -63,7 +63,7 @@ Here is a typical example::
                  renderer='submit.html')
     def add(self):
         
-        form = Form(self.request, 
+        form = Form(request, 
                     defaults={"name" : "..."},
                     schema=MyModelSchema)
 
