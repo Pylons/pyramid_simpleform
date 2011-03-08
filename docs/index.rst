@@ -102,6 +102,8 @@ The steps are:
 
 4. If the form hasn't been validated yet, or contains errors, pass it to your template. The form can optionally be wrapped in a **FormRenderer** which makes it easier to output individual HTML widgets.
 
+For a complete working example, look at the "examples" directory in the source repository.
+
 Validation
 ----------
 
