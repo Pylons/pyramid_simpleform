@@ -184,6 +184,17 @@ class TestForm(unittest.TestCase):
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
+
+    def test_is_validated_with_specified_params(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+
+        form = Form(request, SimpleSchema)
+        form.validate(params={'name' : 'foo'})
+        obj = form.bind(SimpleObj())
+        self.assert_(obj.name == 'foo')
  
     def test_bind(self):
         from pyramid_simpleform import Form
@@ -311,6 +322,17 @@ class TestForm(unittest.TestCase):
         form = Form(request, SimpleSchema, method="GET")
 
         self.assert_(form.validate())
+        self.assert_(form.is_validated)
+
+    def test_force_validate(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.GET['name'] = 'test'
+
+        form = Form(request, SimpleSchema)
+
+        self.assert_(form.validate(force_validate=True))
         self.assert_(form.is_validated)
  
     def test_render_without_htmlfill(self):

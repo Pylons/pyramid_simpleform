@@ -130,7 +130,7 @@ class Form(object):
             errors = [errors]
         return errors
 
-    def validate(self):
+    def validate(self, force_validate=False, params=None):
         """
         Runs validation and returns True/False whether form is 
         valid.
@@ -144,6 +144,10 @@ class Form(object):
 
         The errors and data values will be updated accordingly.
 
+        `force_validate`  : will run validation regardless of request method.
+
+        `params`          : dict or MultiDict of params. By default 
+        will use **request.POST** (if HTTP POST) or **request.params**.
         """
 
         assert self.schema or self.validators, \
@@ -152,14 +156,16 @@ class Form(object):
         if self.is_validated:
             return not(self.errors)
 
-        if self.method and self.method != self.request.method:
-            return False
+        if not force_validate:
+            if self.method and self.method != self.request.method:
+                return False
 
-        if self.method == "POST":
-            params = self.request.POST
-        else:
-            params = self.request.params
-        
+        if params is None:
+            if self.method == "POST":
+                params = self.request.POST
+            else:
+                params = self.request.params
+            
         if self.variable_decode:
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
