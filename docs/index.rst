@@ -94,6 +94,7 @@ In your template (using a Mako template in this example)::
 
 The steps are:
 
+
 1. Create a **Form** instance with a Request and your schema and/or validators. You can optionally pass in default values or an object instance. 
 
 2. Call **validate()**. This will check if the form should be validated (in most cases, if the request method is HTTP POST), and validates against the provided schema. It returns **True** if the form has been validated and there are no errors. Any errors get dumped into the **errors** property as a dict. 
