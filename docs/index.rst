@@ -1,7 +1,14 @@
 pyramid_simpleform
 ==================
 
-**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by `Django forms`_, `WTForms`_ and `Flatland`_. However it's also intended for use with the `Pyramid`_ framework and uses `FormEncode`_ for most of the heavy lifting. It's therefore assumed you are already familiar with FormEncode.
+**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by `Django forms`_, `WTForms`_ and `Flatland`_. However it's also intended for use with the `Pyramid`_ framework and uses `Colander`_ for most of the heavy lifting. It's therefore assumed you are already familiar with Colander.
+
+**PLEASE NOTE**
+
+**pyramid_simpleform** was originally designed to use with FormEncode. FormEncode usage is being deprecated in favour of Colander as of version _, as FormEncode itself is no longer actively maintained and Colander is used by other libraries in the Pyramid ecosystem, such as `Deform`_.
+
+It is therefore recommended if possible that you migrate existing FormEncode schemas over to Colander. 
+
 
 Installation
 ------------
@@ -19,19 +26,21 @@ Getting started
 
 Here is a typical example::
 
-    from pyramid.view import view_config
-    from formencode import Schema, validators
+    import colander
 
-    from pyramid_simpleform import Form
+    from pyramid.view import view_config
+
+    from pyramid_simpleform.form import Form
     from pyramid_simpleform.renderers import FormRenderer
 
-    class MyModelSchema(Schema):
+    class MyModelSchema(colander.MappingSchema):
 
-        filter_extra_fields = True
-        allow_extra_fields = True
+        name = colander.SchemaNode(
+            colander.String(),
+            validator=colander.Length(5)
+        )
 
-        name = validators.MinLength(5, not_empty=True)
-        value = validators.Int(not_empty=True)
+        value = colander.SchemaNode(colander.Int())
 
     class MyModel(object):
 
@@ -46,7 +55,7 @@ Here is a typical example::
         item = session.query(MyModel).get(item_id)
 
         form = Form(request, 
-                    schema=MyModelSchema, 
+                    schema=MyModelSchema(), 
                     obj=item)
 
         if form.validate():
@@ -65,7 +74,7 @@ Here is a typical example::
         
         form = Form(request, 
                     defaults={"name" : "..."},
-                    schema=MyModelSchema)
+                    schema=MyModelSchema())
 
         if form.validate():
 
@@ -121,7 +130,7 @@ Working with models
 
 First, you can pass the `obj` argument to the constructor, which can be used instead of `defaults` to set default values in your form::
 
-    form = Form(request, MyModelSchema, obj=MyModel(name="foo"))
+    form = Form(request, MyModelSchema(), obj=MyModel(name="foo"))
     assert form.data['name'] == 'foo'
 
 Second, the **bind()** method sets object properties from your form fields::
@@ -131,7 +140,7 @@ Second, the **bind()** method sets object properties from your form fields::
         obj = form.bind(MyModel())
 
 
-Some care should be taken when using **bind()**. You should ensure that your schema uses **filter_extra_fields** to remove any unused form fields (perhaps added by a malicious user) from the data. You can also use the parameters **include** and **exclude** to filter any unwanted data::
+Some care should be taken when using **bind()**. You can use the parameters **include** and **exclude** to filter any unwanted data::
 
     if form.validate():
         obj = form.bind(MyModel(), include=['name', 'value'])
@@ -147,7 +156,7 @@ Form rendering can be done completely manually if you wish, or using webhelpers,
 
 The widget methods automatically bind to the relevant field in the parent **Form** class. For example::
 
-    form = Form(request, MySchema, defaults={"name" : "foo"})
+    form = Form(request, MySchema(), defaults={"name" : "foo"})
     renderer = FormRenderer(form)
 
 If this is output using the **text()** method of your renderer::
@@ -159,22 +168,6 @@ will result in this HTML snippet::
     <input type="text" name="name" id="name" value="foo" size="30" />
 
 It is expected that you will want to subclass **FormRenderer**, for example you might wish to generate custom fields with JavaScript, HTML5 fields, and so on.
-
-The **Form** class also comes with an **htmlfill()** method which uses `FormEncode`_ **htmlfill** to render errors and defaults.
-
-Localization and state
-----------------------
-
-FormEncode provides a way to manage localized error messages, detailed `here <http://formencode.org/Validator.html#localization-of-error-messages-i18n>`_. 
-
-If you pass a "state" object to the validation process, FormEncode will check for a "_" gettext function in the state object and use that to localize error messages. To make the process easier, **pyramid_simpleform** uses a "dummy" **State** object if you don't provide the ``state`` argument yourself. You can use this **State** object directly if you wish::
-
-    from pyramid_simpleform import State
-
-    form = Form(request, MySchema, state=State(my_obj=MyObject())
-    # you can access my_obj as state.my_obj in your validators
-
-Whether you provide your own ``state`` argument or not, **pyramid_simpleform** will check for a "_" method. If this is not present then it will set "_" as the default the `translate <http://docs.pylonsproject.org/projects/pyramid/dev/api/i18n.html>`_  method provided with Pyramid's **Localizer** object. As the current request is available to your **Form** instance, this is used to obtain the correct localizer instance for your request.
 
 
 CSRF Validation
@@ -197,6 +190,11 @@ Remember to use the **allow_extra_fields** option with your schema to prevent va
 API
 ---
 
+
+.. module:: pyramid_simpleform.form
+
+.. autoclass:: Form
+
 .. module:: pyramid_simpleform
 
 .. autoclass:: Form
@@ -216,5 +214,7 @@ API
 .. _WTForms: http://pypi.python.org/pypi/WTForms/
 .. _Flatland: http://pypi.python.org/pypi/flatland/
 .. _FormEncode: http://pypi.python.org/pypi/FormEncode/
+.. _Colander: http://pypi.python.org/pypi/FormEncode/
+.. _Deform: http://pypi.python.org/pypi/FormEncode/
 .. _Pyramid: http://pypi.python.org/pypi/pyramid/
 .. _WebHelpers: http://pypi.python.org/pypi/WebHelpers/

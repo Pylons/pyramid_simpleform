@@ -1,3 +1,5 @@
+import warnings
+
 from formencode import htmlfill
 from formencode import variabledecode
 from formencode import Invalid
@@ -71,6 +73,10 @@ class Form(object):
                  obj=None, extra=None, include=None, exclude=None, state=None, 
                  method="POST", variable_decode=False,  dict_char=".", 
                  list_char="-", multipart=False):
+
+        warnings.warn("""
+        Support for FormEncode is deprecated. Use pyramid_simpleform.form.Form
+        with Colander support instead.""")
 
         self.request = request
         self.schema = schema
