@@ -55,6 +55,33 @@ class FormRenderer(object):
         """
         return HTML.tag("div", self.csrf(name), style="display:none;")
 
+    def __start__(self, value):
+        """
+        Renders peppercorn __start__ hidden tags with given values.
+
+        For example:
+
+        form.__start__('series:mapping')
+        >>> <input type="hidden" name="__start__" value="series:mapping" />
+
+        :versionadded: 0.5
+        """
+
+        return self.hidden('__start__', value)
+
+
+    def __end__(self):
+        """
+        Renders peppercorn __end__ hidden tag
+
+        For example:
+
+        form.__end__()
+        >>> <input type="hidden" name="__end__" />
+        """
+
+        return self.hidden('__end__')
+
     def hidden_tag(self, *names):
         """
         Convenience for printing all hidden fields in a form inside a 

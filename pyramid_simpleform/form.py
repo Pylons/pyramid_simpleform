@@ -1,4 +1,5 @@
 import colander
+import peppercorn
 
 
 class Form(object):
@@ -98,6 +99,7 @@ class Form(object):
             else:
                 params = self.request.params
             
+        params = peppercorn.parse(params.items())
         self.data.update(params)
 
         if self.schema:

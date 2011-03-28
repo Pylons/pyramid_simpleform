@@ -16,6 +16,7 @@ requires = [
     'webhelpers',
     'formencode',
     'colander',
+    'peppercorn',
 ]
 
     

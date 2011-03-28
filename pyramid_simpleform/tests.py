@@ -1020,8 +1020,29 @@ class TestColanderFormRenderer(unittest.TestCase):
                 '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="csrft" /></div>')
 
+    def test_start(self):
 
- 
+        from pyramid_simpleform.form import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleColanderSchema())
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.__start__('series:mapping') == \
+                '<input id="__start__" name="__start__" type="hidden" value="series:mapping" />')
+
+    def test_end(self):
+
+        from pyramid_simpleform.form import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleColanderSchema())
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.__end__() == \
+                '<input id="__end__" name="__end__" type="hidden" />')
  
  
     def test_text(self):
