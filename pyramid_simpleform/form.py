@@ -9,8 +9,6 @@ class Form(object):
 
     `schema`  : FormEncode Schema class or instance
 
-    `validators` : a dict of FormEncode validators i.e. { field : validator }
-
     `defaults`   : a dict of default values
 
     `obj`        : instance of an object (e.g. SQLAlchemy model)
