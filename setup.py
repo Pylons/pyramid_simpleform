@@ -21,7 +21,7 @@ requires = [
 
     
 setup(name='pyramid_simpleform',
-      version='0.6.1',
+      version='0.7',
       description='pyramid_simpleform',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

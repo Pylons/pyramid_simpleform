@@ -55,18 +55,21 @@ class FormRenderer(object):
         """
         return HTML.tag("div", self.csrf(name), style="display:none;")
 
-    def __start__(self, value=None):
+    def __start__(self, type, name=None):
         """
         Renders peppercorn __start__ hidden tags with given values.
 
         For example:
 
-        form.__start__('series:mapping')
+        form.__start__('mapping', 'series')
         >>> <input type="hidden" name="__start__" value="series:mapping" />
 
-        :versionadded: 0.5
+        :versionadded: 0.7
         """
 
+        value = type
+        if name:
+            value = name + ":" + value
         return self.hidden('__start__', value)
 
 
@@ -78,6 +81,8 @@ class FormRenderer(object):
 
         form.__end__()
         >>> <input type="hidden" name="__end__" />
+
+        :versionadded: 0.7
         """
 
         return self.hidden('__end__', value)

@@ -1029,7 +1029,7 @@ class TestColanderFormRenderer(unittest.TestCase):
         form = Form(request, SimpleColanderSchema())
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.__start__('series:mapping') == \
+        self.assert_(renderer.__start__('mapping', 'series') == \
                 '<input id="__start__" name="__start__" type="hidden" value="series:mapping" />')
 
     def test_end(self):
