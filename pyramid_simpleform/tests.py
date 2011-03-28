@@ -16,7 +16,11 @@ class SimpleFESchema(Schema):
 
 class SimpleColanderSchema(colander.MappingSchema):
 
-    name = colander.SchemaNode(colander.String(), required=True)
+    name = colander.SchemaNode(
+        colander.String(), 
+        required=True, 
+        validator=colander.Length(1, 100)
+    )
 
 
 class SimpleObj(object):
@@ -412,36 +416,36 @@ class TestColanderForm(unittest.TestCase):
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleColanderSchema)
+        form = Form(request, SimpleColanderSchema())
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
 
     def test_is_validated_with_specified_params(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         form.validate(params={'name' : 'foo'})
         obj = form.bind(SimpleObj())
         self.assert_(obj.name == 'foo')
  
     def test_bind(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         form.validate()
         obj = form.bind(SimpleObj())
         self.assert_(obj.name == 'test')
 
     def test_bind_ignore_underscores(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
@@ -451,118 +455,127 @@ class TestColanderForm(unittest.TestCase):
         class SimpleObjWithPrivate(SimpleObj):
             _ignoreme = None
 
-        class SimpleFESchemaWithPrivate(SimpleFESchema):
+        class SimpleSchemaWithPrivate(SimpleColanderSchema):
             _ignoreme = validators.String()
 
-        form = Form(request, SimpleFESchemaWithPrivate)
+        form = Form(request, SimpleSchemaWithPrivate())
         form.validate()
         obj = form.bind(SimpleObjWithPrivate())
         self.assert_(obj.name == 'test')
         self.assert_(obj._ignoreme is None)
         
     def test_bind_not_validated_yet(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
  
     def test_bind_with_errors(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST['name'] = ''
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         self.assert_(not form.validate())
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
 
     def test_bind_with_exclude(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         form.validate()
         obj = form.bind(SimpleObj(), exclude=["name"])
         self.assert_(obj.name == None)
  
     def test_bind_with_include(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST['name'] = 'test'
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
         form.validate()
         obj = form.bind(SimpleObj(), include=['foo'])
         self.assert_(obj.name == None)
  
     def test_initialize_with_obj(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, obj=SimpleObj(name='test'))
+
+        form = Form(
+            request, 
+            SimpleColanderSchema(), 
+            obj=SimpleObj(name='test')
+        )
 
         self.assert_(form.data['name'] == 'test')
 
     def test_initialize_with_defaults(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={'name' : 'test'})
+        form = Form(
+            request, 
+            SimpleColanderSchema(), 
+            defaults={'name' : 'test'}
+        )
 
         self.assert_(form.data['name'] == 'test')
 
     def test_initialize_with_obj_and_defaults(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, 
+        form = Form(request, SimpleColanderSchema(), 
                     obj=SimpleObj(name='test1'),
                     defaults={'name' : 'test2'})
 
         self.assert_(form.data['name'] == 'test1')
 
-    def test_variable_decode(self):
-        from pyramid_simpleform import Form
-
-        request = testing.DummyRequest()
-        request.POST['name'] = 'test'
-        request.method = "POST"
-        
-        form = Form(request, SimpleFESchema,
-                    variable_decode=True)
-
-        self.assert_(form.validate())
-        self.assert_(form.data['name'] == 'test')
-
     def test_validate_from_GET(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "GET"
         request.GET['name'] = 'test'
 
-        form = Form(request, SimpleFESchema, method="GET")
+        form = Form(request, SimpleColanderSchema(), method="GET")
 
         self.assert_(form.validate())
         self.assert_(form.is_validated)
 
+    def test_validate_from_GET_if_on_POST(self):
+        from pyramid_simpleform.form import Form
+
+        request = testing.DummyRequest()
+        request.method = "GET"
+        request.GET['name'] = 'test'
+
+        form = Form(request, SimpleColanderSchema())
+
+        self.assert_(not form.validate())
+        self.assert_(not form.is_validated)
+
+
     def test_force_validate(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.GET['name'] = 'test'
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema())
 
         self.assert_(form.validate(force_validate=True))
         self.assert_(form.is_validated)
