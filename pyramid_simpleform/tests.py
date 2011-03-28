@@ -388,14 +388,13 @@ class TestColanderForm(unittest.TestCase):
 
     def test_validate_twice(self):
         
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
         request.POST = {'name' : 'ok'}
 
-        form = Form(request, 
-                    validators=dict(name=validators.NotEmpty()))
+        form = Form(request, SimpleColanderSchema())
 
         self.assert_(form.validate())
         self.assert_(form.is_validated)
@@ -407,42 +406,13 @@ class TestColanderForm(unittest.TestCase):
         self.assert_(form.is_validated)
         self.assert_(form.data['name'] == 'ok')
 
-    def test_validate_good_input_with_validators(self):
-        from pyramid_simpleform import Form
-
-        request = testing.DummyRequest()
-        request.method = "POST"
-        request.POST = {'name' : 'ok'}
-
-        form = Form(request, 
-                    validators=dict(name=validators.NotEmpty()))
-
-        self.assert_(form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.data['name'] == 'ok')
-
-    def test_validate_bad_input_with_validators(self):
-        from pyramid_simpleform import Form
-
-        request = testing.DummyRequest()
-        request.method = "POST"
-
-        form = Form(request, 
-                    validators=dict(name=validators.NotEmpty()))
-
-        self.assert_(not form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.is_error('name'))
-
-        self.assert_(form.errors_for('name') == ['Please enter a value'])
-
     def test_is_validated_on_post(self):
-        from pyramid_simpleform import Form
+        from pyramid_simpleform.form import Form
 
         request = testing.DummyRequest()
         request.method = "POST"
 
-        form = Form(request, SimpleFESchema)
+        form = Form(request, SimpleColanderSchema)
 
         self.assert_(not(form.validate()))
         self.assert_(form.is_validated)
