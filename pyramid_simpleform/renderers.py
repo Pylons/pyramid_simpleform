@@ -55,7 +55,7 @@ class FormRenderer(object):
         """
         return HTML.tag("div", self.csrf(name), style="display:none;")
 
-    def __start__(self, value):
+    def __start__(self, value=None):
         """
         Renders peppercorn __start__ hidden tags with given values.
 
@@ -70,7 +70,7 @@ class FormRenderer(object):
         return self.hidden('__start__', value)
 
 
-    def __end__(self):
+    def __end__(self, value=None):
         """
         Renders peppercorn __end__ hidden tag
 
@@ -80,7 +80,7 @@ class FormRenderer(object):
         >>> <input type="hidden" name="__end__" />
         """
 
-        return self.hidden('__end__')
+        return self.hidden('__end__', value)
 
     def hidden_tag(self, *names):
         """
