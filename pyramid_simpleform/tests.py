@@ -332,6 +332,16 @@ class TestState(unittest.TestCase):
         obj = State(foo="bar")
         self.assert_(obj['foo'] == 'bar')
 
+    def test_getitem_notfound(self):
+
+        from pyramid_simpleform import State
+        obj = State()
+        try:
+            obj['foo'] == 'bar'
+            assert False
+        except KeyError:
+            pass
+
     def test_setitem(self):
 
         from pyramid_simpleform import State
@@ -844,6 +854,19 @@ class TestFormencodeForm(unittest.TestCase):
 
         self.assert_(form.validate())
         self.assert_(form.is_validated)
+
+    def test_validate_from_GET_if_on_POST(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "GET"
+        request.GET['name'] = 'test'
+
+        form = Form(request, SimpleFESchema)
+
+        self.assert_(not form.validate())
+        self.assert_(not form.is_validated)
+
 
     def test_force_validate(self):
         from pyramid_simpleform import Form
