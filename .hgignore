@@ -21,6 +21,7 @@ dist
 data
 build
 docs/output
+docs/_build
 docs/_themes
 
 .git
