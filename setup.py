@@ -15,6 +15,7 @@ requires = [
     'pyramid',
     'webhelpers',
     'formencode',
+    'colander',
 ]
 
     
