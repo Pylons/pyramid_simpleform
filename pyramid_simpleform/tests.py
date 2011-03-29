@@ -1020,7 +1020,7 @@ class TestColanderFormRenderer(unittest.TestCase):
                 '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="csrft" /></div>')
 
-    def test_start(self):
+    def test_start_hidden_tag(self):
 
         from pyramid_simpleform.form import Form
         from pyramid_simpleform.renderers import FormRenderer
@@ -1029,10 +1029,10 @@ class TestColanderFormRenderer(unittest.TestCase):
         form = Form(request, SimpleColanderSchema())
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.__start__('mapping', 'series') == \
-                '<input id="__start__" name="__start__" type="hidden" value="series:mapping" />')
+        self.assert_(renderer.start_hidden_tag('mapping', 'series') == \
+                '<div style="display:none;"><input name="__start__" type="hidden" value="series:mapping" /></div>')
 
-    def test_end(self):
+    def test_end_hidden_tag(self):
 
         from pyramid_simpleform.form import Form
         from pyramid_simpleform.renderers import FormRenderer
@@ -1041,8 +1041,20 @@ class TestColanderFormRenderer(unittest.TestCase):
         form = Form(request, SimpleColanderSchema())
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.__end__() == \
-                '<input id="__end__" name="__end__" type="hidden" />')
+        self.assert_(renderer.end_hidden_tag() == \
+                '<div style="display:none;"><input name="__end__" type="hidden" /></div>')
+ 
+    def test_end_hidden_tags(self):
+
+        from pyramid_simpleform.form import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleColanderSchema())
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.end_hidden_tags(1) == \
+                '<div style="display:none;"><input name="__end__" type="hidden" /></div>')
  
  
     def test_text(self):

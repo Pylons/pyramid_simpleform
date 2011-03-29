@@ -55,13 +55,13 @@ class FormRenderer(object):
         """
         return HTML.tag("div", self.csrf(name), style="display:none;")
 
-    def __start__(self, type, name=None):
+    def start_hidden_tag(self, type, name=None, id=''):
         """
         Renders peppercorn __start__ hidden tags with given values.
 
         For example:
 
-        form.__start__('mapping', 'series')
+        renderer.start_hidden_tag('mapping', 'series')
         >>> <input type="hidden" name="__start__" value="series:mapping" />
 
         :versionadded: 0.7
@@ -70,22 +70,47 @@ class FormRenderer(object):
         value = type
         if name:
             value = name + ":" + value
-        return self.hidden('__start__', value)
 
+        return HTML.tag(
+            "div", 
+            self.hidden('__start__', value, id=id), 
+            style="display:none;"
+        )
 
-    def __end__(self, value=None):
+    def end_hidden_tag(self, value=None, id=''):
         """
         Renders peppercorn __end__ hidden tag
 
         For example:
 
-        form.__end__()
+        renderer.end_hidden_tag()
         >>> <input type="hidden" name="__end__" />
 
         :versionadded: 0.7
         """
+        return HTML.tag(
+            "div",
+            self.hidden('__end__', value, id=id),
+            style="display:none;"
+        )
 
-        return self.hidden('__end__', value)
+    def end_hidden_tags(self, num_tags):
+        """
+        Prints a number of peppercorn hidden __end__ tags
+
+        :versionadded: 0.7
+        """
+
+        rv = []
+
+        for i in xrange(num_tags):
+            rv.append(self.hidden('__end__', id=''))
+
+        return HTML.tag(
+            "div",
+            tags.literal("".join(rv)),
+            style="display:none;"
+        )
 
     def hidden_tag(self, *names):
         """
@@ -104,22 +129,34 @@ class FormRenderer(object):
         """
         Outputs text input.
         """
-        id = id or name
-        return tags.text(name, self.value(name, value), id, **attrs)
+        return tags.text(
+            name, 
+            self.value(name, value), 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def file(self, name, value=None, id=None, **attrs):
         """
         Outputs file input.
         """
-        id = id or name
-        return tags.file(name, self.value(name, value), id, **attrs)
+        return tags.file(
+            name, 
+            self.value(name, value), 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def hidden(self, name, value=None, id=None, **attrs):
         """
         Outputs hidden input.
         """
-        id = id or name
-        return tags.hidden(name, self.value(name, value), id, **attrs)
+        return tags.hidden(
+            name, 
+            self.value(name, value), 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def radio(self, name, value=None, checked=False, label=None, **attrs):
         """
@@ -132,16 +169,24 @@ class FormRenderer(object):
         """
         Outputs submit button.
         """
-        id = id or name
-        return tags.submit(name, self.value(name, value), id, **attrs)
+        return tags.submit(
+            name, 
+            self.value(name, value), 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def select(self, name, options, selected_value=None, id=None, **attrs):
         """
         Outputs <select> element.
         """
-        id = id or name
-        return tags.select(name, self.value(name, selected_value), 
-                           options, id, **attrs)
+        return tags.select(
+            name, 
+            self.value(name, selected_value), 
+            options, 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def checkbox(self, name, value="1", checked=False, label=None, id=None, 
                  **attrs):
@@ -149,22 +194,35 @@ class FormRenderer(object):
         Outputs checkbox input.
         """
     
-        id = id or name
-        return tags.checkbox(name, value, self.value(name), label, id, **attrs)
+        return tags.checkbox(
+            name, 
+            value, 
+            self.value(name), 
+            label, 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def textarea(self, name, content="", id=None, **attrs):
         """
         Outputs <textarea> element.
         """
-        id = id or name
-        return tags.textarea(name, self.value(name, content), id, **attrs)
+
+        return tags.textarea(
+            name, 
+            self.value(name, content), 
+            self._get_id(id, name), 
+            **attrs
+        )
 
     def password(self, name, value=None, id=None, **attrs):
         """
         Outputs a password input.
         """
-        id = id or name
-        return tags.password(name, self.value(name, value), id, **attrs)
+        return tags.password(
+            name, self.value(name, value), 
+            self._get_id(id, name), 
+            **attrs)
 
     def is_error(self, name):
         """
@@ -221,4 +279,9 @@ class FormRenderer(object):
             attrs['for_'] = name
         label = label or name.capitalize()
         return HTML.tag("label", label, **attrs)
+
+    def _get_id(self, id, name):
+        if id is None:
+            id = name
+        return id
 
