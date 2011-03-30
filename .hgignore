@@ -12,7 +12,7 @@ syntax: glob
 *.orig
 *.cfg
 *.tox
-
+*$py.class
 
 *~
 
@@ -26,5 +26,8 @@ docs/_themes
 
 .git
 .gitignore
+nosetests.xml
+pyramid_simpleform/coverage.xml
 
 env26/
+.tox/
