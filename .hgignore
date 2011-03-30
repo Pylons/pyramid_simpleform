@@ -26,3 +26,5 @@ docs/_themes
 
 .git
 .gitignore
+
+env26/
