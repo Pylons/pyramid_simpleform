@@ -182,7 +182,7 @@ The **FormRenderer** class supports the creation of the special `__start__` and 
 
     renderer = FormRenderer(form)
     renderer.start_hidden_tag('mapping', 'series')
-    >>> <<div style="display:none;">input type="hidden" name="__start__" value="series:mapping" /></div>
+    >>> <<div style="display:none;"><input type="hidden" name="__start__" value="series:mapping" /></div>
 
     renderer.end_hidden_tag()
     >>> <div style="display:none;"><input type="hidden" name="__end__" /></div>
@@ -196,6 +196,7 @@ The parameters are automatically passed through the Peppercorn ``parse`` functio
 
 See the `Peppercorn`_ docs for more information.
 
+[TBD: full example]
 
 CSRF Validation
 ---------------
