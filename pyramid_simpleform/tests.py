@@ -102,8 +102,7 @@ class TestColanderForm(unittest.TestCase):
         form.errors = {"name" : u"Name is missing",
                        "value" : u"Value is missing"}
         self.assert_(form.all_errors() == [
-            u"Name is missing", 
-            u"Value is missing"])
+            u"Name is missing"])
 
     def test_errors_for(self):
         from pyramid_simpleform.form import Form

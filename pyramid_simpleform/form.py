@@ -55,7 +55,10 @@ class Form(object):
         """
         Returns all errors in a single list.
         """
-        return self.errors.values()
+        errors = []
+        for node in self.schema:
+            errors += self.errors_for(node.name)
+        return errors
 
     def errors_for(self, field):
         """
