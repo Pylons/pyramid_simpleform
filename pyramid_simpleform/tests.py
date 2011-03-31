@@ -311,7 +311,6 @@ class TestColanderForm(unittest.TestCase):
  
 class TestFormencodeForm(unittest.TestCase):
     
-
     def test_is_error(self):
         from pyramid_simpleform import Form
 

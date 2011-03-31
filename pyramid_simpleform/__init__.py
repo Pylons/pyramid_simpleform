@@ -40,8 +40,11 @@ class State(object):
 
 class Form(object):
 
-
     """
+    Legacy class for validating FormEncode schemas and validators.
+
+    :deprecated: 0.7
+
     `request` : Pyramid request instance
 
     `schema`  : FormEncode Schema class or instance

@@ -77,13 +77,13 @@ class Form(object):
         valid.
         
         This will check if the form should be validated (i.e. the
-        request method matches) and the schema/validators validate.
+        request method matches) and the schema validates.
 
         Validation will only be run once; subsequent calls to 
         validate() will have no effect, i.e. will just return
         the original result.
 
-        The errors and data values will be updated accordingly.
+        The `errors` and `data` dicts will be updated accordingly.
 
         `force_validate`  : will run validation regardless of request method.
 

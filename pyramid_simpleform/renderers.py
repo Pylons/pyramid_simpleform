@@ -59,10 +59,10 @@ class FormRenderer(object):
         """
         Renders peppercorn __start__ hidden tags with given values.
 
-        For example:
+        For example::
 
-        renderer.start_hidden_tag('mapping', 'series')
-        >>> <input type="hidden" name="__start__" value="series:mapping" />
+            renderer.start_hidden_tag('mapping', 'series')
+            >>> <input type="hidden" name="__start__" value="series:mapping" />
 
         :versionadded: 0.7
         """
@@ -81,10 +81,10 @@ class FormRenderer(object):
         """
         Renders peppercorn __end__ hidden tag
 
-        For example:
+        For example::
 
-        renderer.end_hidden_tag()
-        >>> <input type="hidden" name="__end__" />
+            renderer.end_hidden_tag()
+            >>> <input type="hidden" name="__end__" />
 
         :versionadded: 0.7
         """
