@@ -36,6 +36,8 @@ class Form(object):
         self.errors = {}
         self.data = {}
 
+        self.non_field_errors = []
+
         if defaults:
             self.data.update(defaults)
 
@@ -55,7 +57,7 @@ class Form(object):
         """
         Returns all errors in a single list.
         """
-        errors = []
+        errors = self.non_field_errors[:]
         for node in self.schema:
             errors += self.errors_for(node.name)
         return errors

@@ -99,9 +99,10 @@ class TestColanderForm(unittest.TestCase):
         request.method = "POST"
 
         form = Form(request, SimpleColanderSchema())
-        form.errors = {"name" : u"Name is missing",
-                       "value" : u"Value is missing"}
+        form.errors = {"name" : u"Name is missing",}
+        form.non_field_errors.append(u"Value is missing")
         self.assert_(form.all_errors() == [
+            u"Value is missing",
             u"Name is missing"])
 
     def test_errors_for(self):
