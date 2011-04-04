@@ -1,3 +1,4 @@
+import pprint
 import logging
 import colander
 
@@ -20,6 +21,15 @@ class MyModelSchema(colander.MappingSchema):
     value = colander.SchemaNode(
         colander.Int()
     )
+
+
+class NestedSchema(colander.MappingSchema):
+
+    number = colander.SchemaNode(
+        colander.Int()
+    )
+
+    model = MyModelSchema()
 
 
 log = logging.getLogger(__name__)
@@ -67,5 +77,16 @@ class MainHandler(object):
             session.flush()
 
             return HTTPFound(location="/")
+
+        return dict(form=FormRenderer(form))
+
+    @action(renderer='nested.html')
+    def nested(self):
+
+        form = Form(self.request, schema=NestedSchema())
+
+        if form.validate():
+
+            print pprint.pprint(form.data)
 
         return dict(form=FormRenderer(form))

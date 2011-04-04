@@ -13,10 +13,17 @@ class FormRenderer(object):
 
         self.form = form
         self.data = self.form.data
+        self.context = []
         self.csrf_field = csrf_field
 
     def value(self, name, default=None):
-        return self.data.get(name, default)
+        try:
+            context = self.context[0]  
+            data = self.data.get(context, {})
+        except IndexError:
+            data = self.data
+
+        return data.get(name, default)
 
     def begin(self, url=None, **attrs):
         """
@@ -71,11 +78,20 @@ class FormRenderer(object):
         if name:
             value = name + ":" + value
 
+        # push data stack
+        self.context.insert(0, name)
+
         return HTML.tag(
             "div", 
             self.hidden('__start__', value, id=id), 
             style="display:none;"
         )
+
+    def start_mapping_tag(self, name=None, id=''):
+        return self.start_hidden_tag('mapping', name, id)
+
+    def start_sequence_tag(self, name=None, id=''):
+        return self.start_hidden_tag('sequence', name, id)
 
     def end_hidden_tag(self, value=None, id=''):
         """
@@ -88,6 +104,8 @@ class FormRenderer(object):
 
         :versionadded: 0.7
         """
+        self.context.pop()
+
         return HTML.tag(
             "div",
             self.hidden('__end__', value, id=id),
@@ -105,6 +123,7 @@ class FormRenderer(object):
 
         for i in xrange(num_tags):
             rv.append(self.hidden('__end__', id=''))
+            self.context.pop()
 
         return HTML.tag(
             "div",
@@ -162,7 +181,7 @@ class FormRenderer(object):
         """
         Outputs radio input.
         """
-        checked = self.data.get(name) == value or checked
+        checked = self.value(name) == value or checked
         return tags.radio(name, value, checked, label, **attrs)
 
     def submit(self, name, value=None, id=None, **attrs):
