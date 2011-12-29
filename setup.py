@@ -1,5 +1,4 @@
 import os
-import sys
 
 from setuptools import setup, find_packages
 
@@ -19,7 +18,6 @@ requires = [
     'peppercorn',
 ]
 
-    
 setup(name='pyramid_simpleform',
       version='0.7',
       description='pyramid_simpleform',
@@ -32,7 +30,7 @@ setup(name='pyramid_simpleform',
         ],
       author='Dan Jacob',
       author_email='danjac354@gmail.com',
-      url='http://bitbucket.org/danjac/pyramid_simpleform',
+      url='https://github.com/Pylons/pyramid_simpleform',
       keywords='web pyramid pylons',
       packages=find_packages(),
       include_package_data=True,

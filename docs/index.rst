@@ -17,7 +17,7 @@ Install using **pip install pyramid_simpleform** or **easy_install pyramid_simpl
 
 If installing from source, untar/unzip, cd into the directory and do **python setup.py install**.
 
-The source repository is on `Bitbucket`_. Please report any bugs, issues or queries there. 
+The source repository is on `GitHub`_. Please report any bugs, issues or queries there. 
 
 Getting started
 ---------------
@@ -280,7 +280,7 @@ API
    :members:
 
 
-.. _Bitbucket: http://bitbucket.org/danjac/pyramid_simpleform
+.. _GitHub: https://github.com/Pylons/pyramid_simpleform
 .. _Django forms: http://docs.djangoproject.com/en/dev/topics/forms/
 .. _WTForms: http://pypi.python.org/pypi/WTForms/
 .. _Flatland: http://pypi.python.org/pypi/flatland/
