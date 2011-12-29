@@ -1,5 +1,3 @@
-syntax: glob
-
 *.coverage
 *.egg-info
 *.egg
@@ -24,8 +22,6 @@ docs/output
 docs/_build
 docs/_themes
 
-.git
-.gitignore
 nosetests.xml
 pyramid_simpleform/coverage.xml
 
