@@ -1,14 +1,7 @@
 pyramid_simpleform
 ==================
 
-**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by `Django forms`_, `WTForms`_ and `Flatland`_. However it's also intended for use with the `Pyramid`_ framework and uses `Colander`_ for most of the heavy lifting. It's therefore assumed you are already familiar with Colander.
-
-**PLEASE NOTE**
-
-**pyramid_simpleform** was originally designed to use with FormEncode. FormEncode usage is being deprecated in favour of Colander as of version **0.7**, as FormEncode itself is no longer actively maintained and Colander is used by other libraries in the Pyramid ecosystem, such as `Deform`_.
-
-It is therefore recommended if possible that you migrate existing FormEncode schemas over to Colander. 
-
+**pyramid_simpleform**, as the name implies, is a simple form validation and rendering library. It's intended to replace the old ``@validate`` decorator from Pylons with a form handling pattern inspired by `Django forms`_, `WTForms`_ and `Flatland`_. However it's also intended for use with the `Pyramid`_ framework and uses `FormEncode`_ for most of the heavy lifting. It's therefore assumed you are already familiar with FormEncode.
 
 Installation
 ------------
@@ -26,21 +19,16 @@ Getting started
 
 Here is a typical (truncated) example::
 
-    import colander
+    from formencode import Schema, validators
+    from pyramid_simpleform import Form
 
-    from pyramid.view import view_config
+    class MySchema(Schema):
 
-    from pyramid_simpleform.form import Form
-    from pyramid_simpleform.renderers import FormRenderer
+        allow_extra_fields = True
+        filter_extra_fields = True
 
-    class MyModelSchema(colander.MappingSchema):
-
-        name = colander.SchemaNode(
-            colander.String(),
-            validator=colander.Length(5)
-        )
-
-        value = colander.SchemaNode(colander.Int())
+        name = validators.UnicodeString(max=5)
+        value = validators.Int()
 
     class MyModel(object):
         """
@@ -115,6 +103,8 @@ The steps are:
 
 4. If the form hasn't been validated yet, or contains errors, pass it to your template. The form can optionally be wrapped in a **FormRenderer** which makes it easier to output individual HTML widgets.
 
+Note the use of the `allow_extra_fields` and `filter_extra_fields` attributes. These are recommended in order to remove unneeded fields (such as the CSRF) and also to prevent extra field values being passed through.
+
 For a complete working example, look at the "examples" directory in the source repository.
 
 Validation
@@ -173,31 +163,6 @@ will result in this HTML snippet::
 It is expected that you will want to subclass **FormRenderer**, for example you might wish to generate custom fields with JavaScript, HTML5 fields, and so on.
 
 
-Peppercorn
-----------
-
-**pyramid_simpleform** has optional support for the `Peppercorn`_ library, which is used for more advanced serialization/deserialization of web input. 
-
-The **FormRenderer** class supports the creation of the special `__start__` and `__end__` hidden tags required by Peppercorn::
-
-    renderer = FormRenderer(form)
-    renderer.start_hidden_tag('mapping', 'series')
-    >>> <<div style="display:none;"><input type="hidden" name="__start__" value="series:mapping" /></div>
-
-    renderer.end_hidden_tag()
-    >>> <div style="display:none;"><input type="hidden" name="__end__" /></div>
-
-    renderer_end_hidden_tags(3)
-    >>> <div style="display:none;"><input type="hidden" name="__end__" /><input type="hidden" name="__end__" /><input type="hidden" name="__end__" /></div>
-
-Note that the hidden tags are automatically wrapped in hidden DIVs to preserve valid markup.
-
-The parameters are automatically passed through the Peppercorn ``parse`` function. 
-
-See the `Peppercorn`_ docs for more information.
-
-[TBD: full example]
-
 CSRF Validation
 ---------------
 
@@ -214,47 +179,9 @@ CSRF Validation
 However the **FormRenderer** class has a couple of helper methods for rendering the CSRF hidden input. **csrf()** just prints the input tag, while **csrf_token()** wraps the input in a hidden DIV to keep your markup valid.
 
 
-Formencode
-----------
-
-**pyramid_simpleform** includes legacy support for `FormEncode`_ schemas and validators. This usage is deprecated and so will be eventually phased out, so it is recommended if possible to migrate existing FormEncode-based simpleform usage to Colander.
-
-You can access the old FormEncode Form class directly under the **pyramid_simpleform** package::
-
-    from pyramid_simpleform import Form
-
-Contrast this with the new, Colander-based class::
-
-    from pyramid_simpleform.form import Form
-
-The FormEncode-based Form works pretty much as the new Form, except that you pass in a FormEncode schema, or a dict of validators, rather than a Colander schema::
-
-    from formencode import Schema, validators
-    from pyramid_simpleform import Form
-
-    class MySchema(Schema):
-
-        allow_extra_fields = True
-        filter_extra_fields = True
-
-        name = validators.String(not_empty=True)
-
-    form = Form(request, MySchema)
-    if form.validate():
-        obj = form.bind(MyModel())
-        # ... process as usual
-
-It uses the same **FormRenderer** class::
-
-    renderer = FormRenderer(form)
-
-
-Note the use of the `allow_extra_fields` and `filter_extra_fields` attributes. These are recommended in order to remove unneeded fields (such as the CSRF) and also to prevent extra field values being passed through.
-
 State
 -----
 
-The FormEncode-based Form also includes support for handling state, including i18n.
 [TBD]
 
 API

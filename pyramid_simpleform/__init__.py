@@ -4,7 +4,7 @@ from formencode import htmlfill
 from formencode import variabledecode
 from formencode import Invalid
 
-from pyramid.i18n import get_localizer
+from pyramid.i18n import get_localizer, TranslationStringFactory, TranslationString
 from pyramid.renderers import render
 
 class State(object):
@@ -36,6 +36,20 @@ class State(object):
 
     def get(self, k, default=None):
         return getattr(self, k, default)
+
+fe_tsf = TranslationStringFactory('FormEncode')
+
+
+def get_default_translate_fn(request):
+    pyramid_translate = get_localizer(request).translate
+
+    def translate(s):
+        if not isinstance(s, TranslationString):
+            s = fe_tsf(s)
+
+        return pyramid_translate(s)
+
+    return translate
 
 
 class Form(object):
@@ -77,10 +91,6 @@ class Form(object):
                  method="POST", variable_decode=False,  dict_char=".", 
                  list_char="-", multipart=False):
 
-        warnings.warn("""
-        Support for FormEncode is deprecated. Use pyramid_simpleform.form.Form
-        with Colander support instead.""")
-
         self.request = request
         self.schema = schema
         self.validators = validators or {}
@@ -100,16 +110,16 @@ class Form(object):
             self.state = self.default_state()
 
         if not hasattr(self.state, '_'):
-            self.state._ = get_localizer(self.request).translate
+            self.state._ = get_default_translate_fn(request)
 
         if defaults:
             self.data.update(defaults)
 
         if obj:
-            fields = self.schema.fields.keys() + self.validators.keys() 
+            fields = self.schema.fields.keys() + self.validators.keys()
             for f in fields:
                 if hasattr(obj, f):
-                    self.data[f] = getattr(obj, f) 
+                    self.data[f] = getattr(obj, f)
 
     def is_error(self, field):
         """

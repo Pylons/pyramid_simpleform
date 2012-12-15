@@ -136,7 +136,7 @@ class Renderer(object):
         """
         Shortcut for **self.form.errors_for(name)**
         """
-        return self.errors 
+        return self.form.errors_for(name)
 
     def all_errors(self):
         """

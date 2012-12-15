@@ -27,3 +27,4 @@ pyramid_simpleform/coverage.xml
 
 env26/
 .tox/
+coverage.xml
