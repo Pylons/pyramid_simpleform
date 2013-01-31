@@ -1,5 +1,3 @@
-import warnings
-
 from formencode import htmlfill
 from formencode import variabledecode
 from formencode import Invalid
@@ -56,8 +54,6 @@ class Form(object):
 
     """
     Legacy class for validating FormEncode schemas and validators.
-
-    :deprecated: 0.7
 
     `request` : Pyramid request instance
 
