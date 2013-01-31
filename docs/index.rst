@@ -188,11 +188,6 @@ API
 ---
 
 
-.. module:: pyramid_simpleform.form
-
-.. autoclass:: Form
-   :members:
-
 .. module:: pyramid_simpleform
 
 .. autoclass:: Form
