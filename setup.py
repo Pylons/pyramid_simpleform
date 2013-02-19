@@ -12,7 +12,7 @@ except IOError:
 
 requires = [
     'pyramid',
-    'webhelpers',
+    'WebHelpers',
     'formencode',
 ]
 
