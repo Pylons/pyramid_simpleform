@@ -13,7 +13,7 @@ except IOError:
 requires = [
     'pyramid',
     'WebHelpers',
-    'formencode',
+    'FormEncode',
 ]
 
 setup(name='pyramid_simpleform',
