@@ -76,15 +76,15 @@ class Form(object):
     `list_char`       : variabledecode list char
 
     Also note that values of ``obj`` supercede those of ``defaults``. Only
-    fields specified in your schema or validators will be taken from the 
+    fields specified in your schema or validators will be taken from the
     object.
     """
 
     default_state = State
 
-    def __init__(self, request, schema=None, validators=None, defaults=None, 
-                 obj=None, extra=None, include=None, exclude=None, state=None, 
-                 method="POST", variable_decode=False,  dict_char=".", 
+    def __init__(self, request, schema=None, validators=None, defaults=None,
+                 obj=None, extra=None, include=None, exclude=None, state=None,
+                 method="POST", variable_decode=False,  dict_char=".",
                  list_char="-", multipart=False):
 
         self.request = request
@@ -120,7 +120,16 @@ class Form(object):
     def is_error(self, field):
         """
         Checks if individual field has errors.
+
+        Traverses nested forms when dotted notation is provided.
         """
+        if '.' in field:
+            subset = self.errors
+            for part in field.split('.'):
+                if part not in subset:
+                    return False
+                subset = subset[part]
+            return True
         return field in self.errors
 
     def all_errors(self):
@@ -140,20 +149,27 @@ class Form(object):
         """
         Returns any errors for a given field as a list.
         """
-        errors = self.errors.get(field, [])
+        if '.' in field:
+            errors = self.errors
+            for part in field.split('.'):
+                if not isinstance(errors, dict) or part not in errors:
+                    return []
+                errors = errors[part]
+        else:
+            errors = self.errors.get(field, [])
         if isinstance(errors, basestring):
             errors = [errors]
         return errors
 
     def validate(self, force_validate=False, params=None):
         """
-        Runs validation and returns True/False whether form is 
+        Runs validation and returns True/False whether form is
         valid.
-        
+
         This will check if the form should be validated (i.e. the
         request method matches) and the schema/validators validate.
 
-        Validation will only be run once; subsequent calls to 
+        Validation will only be run once; subsequent calls to
         validate() will have no effect, i.e. will just return
         the original result.
 
@@ -161,7 +177,7 @@ class Form(object):
 
         `force_validate`  : will run validation regardless of request method.
 
-        `params`          : dict or MultiDict of params. By default 
+        `params`          : dict or MultiDict of params. By default
         will use **request.POST** (if HTTP POST) or **request.params**.
         """
 
@@ -180,7 +196,7 @@ class Form(object):
                 params = self.request.POST
             else:
                 params = self.request.params
-            
+
         if self.variable_decode:
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
@@ -216,10 +232,10 @@ class Form(object):
         Binds validated field values to an object instance, for example a
         SQLAlchemy model instance.
 
-        `include` : list of included fields. If field not in this list it 
+        `include` : list of included fields. If field not in this list it
         will not be bound to this object.
 
-        `exclude` : list of excluded fields. If field is in this list it 
+        `exclude` : list of excluded fields. If field is in this list it
         will not be bound to the object.
 
         Returns the `obj` passed in.
@@ -258,7 +274,7 @@ class Form(object):
 
         charset = getattr(self.request, 'charset', 'utf-8')
         htmlfill_kwargs.setdefault('encoding', charset)
-        return htmlfill.render(content, 
+        return htmlfill.render(content,
                                defaults=self.data,
                                errors=self.errors,
                                **htmlfill_kwargs)
@@ -267,7 +283,7 @@ class Form(object):
               **htmlfill_kwargs):
         """
         Renders the form directly to a template,
-        using Pyramid's **render** function. 
+        using Pyramid's **render** function.
 
         `template` : name of template
 
@@ -292,7 +308,7 @@ class Form(object):
                 return dict(form=form.render("my_form.html"))
 
         """
-        
+
         extra_info = extra_info or {}
         extra_info.setdefault('form', self)
 

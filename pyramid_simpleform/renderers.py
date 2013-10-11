@@ -29,9 +29,9 @@ class Renderer(object):
         Outputs text input.
         """
         return tags.text(
-            name, 
-            self.value(name, value), 
-            self._get_id(id, name), 
+            name,
+            self.value(name, value),
+            self._get_id(id, name),
             **attrs
         )
 
@@ -40,9 +40,9 @@ class Renderer(object):
         Outputs file input.
         """
         return tags.file(
-            name, 
-            self.value(name, value), 
-            self._get_id(id, name), 
+            name,
+            self.value(name, value),
+            self._get_id(id, name),
             **attrs
         )
 
@@ -54,9 +54,9 @@ class Renderer(object):
             value = self.value(name)
 
         return tags.hidden(
-            name, 
-            value, 
-            self._get_id(id, name), 
+            name,
+            value,
+            self._get_id(id, name),
             **attrs
         )
 
@@ -72,9 +72,9 @@ class Renderer(object):
         Outputs submit button.
         """
         return tags.submit(
-            name, 
-            self.value(name, value), 
-            self._get_id(id, name), 
+            name,
+            self.value(name, value),
+            self._get_id(id, name),
             **attrs
         )
 
@@ -83,25 +83,25 @@ class Renderer(object):
         Outputs <select> element.
         """
         return tags.select(
-            name, 
-            self.value(name, selected_value), 
-            options, 
-            self._get_id(id, name), 
+            name,
+            self.value(name, selected_value),
+            options,
+            self._get_id(id, name),
             **attrs
         )
 
-    def checkbox(self, name, value="1", checked=False, label=None, id=None, 
+    def checkbox(self, name, value="1", checked=False, label=None, id=None,
                  **attrs):
         """
         Outputs checkbox input.
         """
-    
+
         return tags.checkbox(
-            name, 
-            value, 
-            self.value(name), 
-            label, 
-            self._get_id(id, name), 
+            name,
+            value,
+            self.value(name),
+            label,
+            self._get_id(id, name),
             **attrs
         )
 
@@ -111,9 +111,9 @@ class Renderer(object):
         """
 
         return tags.textarea(
-            name, 
-            self.value(name, content), 
-            self._get_id(id, name), 
+            name,
+            self.value(name, content),
+            self._get_id(id, name),
             **attrs
         )
 
@@ -122,15 +122,15 @@ class Renderer(object):
         Outputs a password input.
         """
         return tags.password(
-            name, self.value(name, value), 
-            self._get_id(id, name), 
+            name, self.value(name, value),
+            self._get_id(id, name),
             **attrs)
 
     def is_error(self, name):
         """
         Shortcut for **self.form.is_error(name)**
         """
-        return name in self.errors
+        return self.form.is_error(name)
 
     def errors_for(self, name):
         """
@@ -163,7 +163,7 @@ class Renderer(object):
             return ''
 
         content = "\n".join(HTML.tag("li", error) for error in errors)
-        
+
         if 'class_' not in attrs:
             attrs['class_'] = "error"
 
@@ -171,7 +171,7 @@ class Renderer(object):
 
     def label(self, name, label=None, **attrs):
         """
-        Outputs a <label> element. 
+        Outputs a <label> element.
 
         `name`  : field name. Automatically added to "for" attribute.
 
@@ -182,7 +182,7 @@ class Renderer(object):
             if self.id_prefix:
                 for_ = self.id_prefix + for_
             attrs['for_'] = for_
-            
+
         label = label or name.capitalize()
         return HTML.tag("label", label, **attrs)
 
@@ -210,8 +210,8 @@ class FormRenderer(Renderer):
         self.csrf_field = csrf_field
 
         super(FormRenderer, self).__init__(
-            self.form.data, 
-            self.form.errors, 
+            self.form.data,
+            self.form.errors,
             id_prefix,
         )
 
@@ -231,7 +231,7 @@ class FormRenderer(Renderer):
         Closes the form, i.e. outputs </form>.
         """
         return tags.end_form()
-    
+
     def csrf(self, name=None):
         """
         Returns the CSRF hidden input. Creates new CSRF token
@@ -255,15 +255,15 @@ class FormRenderer(Renderer):
 
     def hidden_tag(self, *names):
         """
-        Convenience for printing all hidden fields in a form inside a 
+        Convenience for printing all hidden fields in a form inside a
         hidden DIV. Will also render the CSRF hidden field.
 
         :versionadded: 0.4
         """
         inputs = [self.hidden(name) for name in names]
         inputs.append(self.csrf())
-        return HTML.tag("div", 
-                        tags.literal("".join(inputs)), 
+        return HTML.tag("div",
+                        tags.literal("".join(inputs)),
                         style="display:none;")
 
 
@@ -272,7 +272,7 @@ class SequenceRenderer(Renderer):
     def __init__(self, name, data, errors, id_prefix=None, min_entries=0):
 
         self.name = name
-        
+
         num_entries = min_entries - len(data)
         if num_entries > 0:
             for i in xrange(num_entries):
@@ -291,9 +291,9 @@ class SequenceRenderer(Renderer):
         return self.hidden('__end__', value='%s:sequence' % self.name, id='')
 
     def __iter__(self):
-        
+
         # what kind of data we dealing with ?
-    
+
         for i, d in enumerate(self.data):
 
             if not isinstance(d, dict):
@@ -302,7 +302,7 @@ class SequenceRenderer(Renderer):
             errors = [] # to be determined
             id_prefix = "%d-" % i
 
-            yield MappingRenderer(self.name, d, errors, id_prefix=id_prefix) 
+            yield MappingRenderer(self.name, d, errors, id_prefix=id_prefix)
 
 
 class MappingRenderer(Renderer):
@@ -328,5 +328,3 @@ class MappingRenderer(Renderer):
         name = name or self.name
 
         return self.hidden('__end__', value='%s:mapping' % name, id='')
-
-
