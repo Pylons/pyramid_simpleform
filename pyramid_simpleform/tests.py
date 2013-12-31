@@ -365,7 +365,8 @@ class TestFormencodeForm(unittest.TestCase):
         settings = {}
 
         settings['mako.directories'] = 'pyramid_simpleform:templates'
-        config = Configurator(settings=settings)
+        config = testing.setUp(settings=settings)
+        config.include('pyramid_mako')
 
 
         request.registry = config.registry
@@ -388,7 +389,8 @@ class TestFormencodeForm(unittest.TestCase):
         settings = {}
 
         settings['mako.directories'] = 'pyramid_simpleform:templates'
-        config = Configurator(settings=settings)
+        config = testing.setUp(settings=settings)
+        config.include('pyramid_mako')
 
 
         request.registry = config.registry

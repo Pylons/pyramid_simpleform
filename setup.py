@@ -12,6 +12,7 @@ except IOError:
 
 requires = [
     'pyramid',
+    'pyramid_mako',
     'WebHelpers',
     'FormEncode',
 ]
