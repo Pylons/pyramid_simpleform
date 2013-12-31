@@ -1,5 +1,6 @@
 import unittest
 
+import formencode
 from formencode import Schema
 from formencode import validators
 
@@ -10,6 +11,7 @@ from pyramid.config import Configurator
 class SimpleFESchema(Schema):
 
     name = validators.NotEmpty()
+    names = formencode.ForEach()
 
 
 class SimpleObj(object):
@@ -310,13 +312,32 @@ class TestFormencodeForm(unittest.TestCase):
 
         request = testing.DummyRequest()
         request.POST['name'] = 'test'
+        request.POST['names-1'] = 'test1'
+        request.POST['names-2'] = 'test2'
         request.method = "POST"
-        
+
         form = Form(request, SimpleFESchema,
                     variable_decode=True)
 
-        self.assert_(form.validate())
-        self.assert_(form.data['name'] == 'test')
+        self.assertTrue(form.validate())
+        self.assertEquals(form.data['name'], 'test')
+        self.assertEquals(form.data['names'], ['test1', 'test2'])
+
+    def test_variable_decode_with_error(self):
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.POST['name'] = ''
+        request.POST['names-1'] = 'test1'
+        request.POST['names-2'] = 'test2'
+        request.method = "POST"
+
+        form = Form(request, SimpleFESchema,
+                    variable_decode=True)
+
+        self.assertFalse(form.validate())
+        self.assertEquals(form.data['name'], '')
+        self.assertEquals(form.data['names'], ['test1', 'test2'])
 
     def test_validate_from_GET(self):
         from pyramid_simpleform import Form
