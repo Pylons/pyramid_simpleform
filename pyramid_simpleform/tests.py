@@ -102,6 +102,37 @@ class TestFormencodeForm(unittest.TestCase):
         form.errors = [u"Name is missing"]
         self.assert_(form.all_errors() == [u"Name is missing"])
 
+    def test_ok_with_jsonbody(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        
+        import json
+        request.json_body = json.loads('{"name" : "ok"}')
+        
+        form = Form(request, SimpleFESchema)
+        self.assert_(form.validate())
+
+    def test_error_with_jsonbody(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        
+        import json
+        request.json_body = json.loads('{}')
+        
+        form = Form(request, SimpleFESchema)
+        form.errors = {"name" : [u"Name is missing"],
+                       "value" : u"Value is missing"}
+        self.assert_(sorted(form.all_errors()) == sorted([
+            u"Name is missing", 
+            u"Value is missing"]))
+
+        
     def test_all_errors_with_dict(self):
 
         from pyramid_simpleform import Form

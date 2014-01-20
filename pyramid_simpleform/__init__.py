@@ -162,7 +162,7 @@ class Form(object):
         `force_validate`  : will run validation regardless of request method.
 
         `params`          : dict or MultiDict of params. By default 
-        will use **request.POST** (if HTTP POST) or **request.params**.
+        will use **request.json_body** (if JSON body), **request.POST** (if HTTP POST) or **request.params**.
         """
 
         assert self.schema or self.validators, \
@@ -176,12 +176,14 @@ class Form(object):
                 return False
 
         if params is None:
-            if self.method == "POST":
+            if hasattr(self.request, 'json_body') and self.request.json_body:
+                params = self.request.json_body
+            elif self.method == "POST":
                 params = self.request.POST
             else:
                 params = self.request.params
             
-        if self.variable_decode:
+        if self.variable_decode and not (hasattr(self.request, 'json_body') and self.request.json_body):
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
 
