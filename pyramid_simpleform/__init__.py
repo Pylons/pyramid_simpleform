@@ -183,7 +183,7 @@ class Form(object):
             else:
                 params = self.request.params
             
-        if self.variable_decode:
+        if self.variable_decode and not (hasattr(self.request, 'json_body') and self.request.json_body):
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
 
