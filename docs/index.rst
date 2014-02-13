@@ -21,6 +21,7 @@ Here is a typical (truncated) example::
 
     from formencode import Schema, validators
     from pyramid_simpleform import Form
+    from pyramid_simpleform.renderers import FormRenderer
 
     class MySchema(Schema):
 
