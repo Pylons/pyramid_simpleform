@@ -99,7 +99,7 @@ class Renderer(object):
         return tags.checkbox(
             name, 
             value, 
-            self.value(name), 
+            self.value(name, checked), 
             label, 
             self._get_id(id, name), 
             **attrs
