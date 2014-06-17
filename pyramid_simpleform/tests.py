@@ -639,9 +639,52 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         request = testing.DummyRequest()
         form = Form(request, SimpleFESchema, defaults={"name" : True})
         renderer = FormRenderer(form)
-        
+
         self.assert_(renderer.checkbox("name") == \
             '<input checked="checked" id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+    def test_checkbox_checked(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema)
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.checkbox("name") == \
+            '<input id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+        self.assert_(renderer.checkbox("name", checked=True) == \
+            '<input checked="checked" id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+    def test_checkbox_checked_with_default(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name" : True})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.checkbox("name", checked=False) == \
+            '<input checked="checked" id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+        self.assert_(renderer.checkbox("name", checked=True) == \
+            '<input checked="checked" id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+        form = Form(request, SimpleFESchema, defaults={"name" : False})
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.checkbox("name", checked=False) == \
+            '<input id="name" name="name" type="checkbox" '
+            'value="1" />')
+
+        self.assert_(renderer.checkbox("name", checked=True) == \
+            '<input id="name" name="name" type="checkbox" '
             'value="1" />')
 
     def test_is_error(self):
