@@ -189,6 +189,8 @@ class Form(object):
 
         else:
             decoded = params
+        if hasattr(decoded, "mixed"):
+            decoded = decoded.mixed()
 
         self.data.update(params)
 

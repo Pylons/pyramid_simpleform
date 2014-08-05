@@ -211,6 +211,24 @@ class TestFormencodeForm(unittest.TestCase):
 
         self.assert_(form.errors_for('name') == ['Please enter a value'])
 
+    def test_foreach_with_validators_and_multidict(self):
+        from formencode import ForEach
+        from pyramid_simpleform import Form
+        from webob.multidict import MultiDict
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = MultiDict([
+            ("name", "1"),
+            ("name", "2"),
+            ("name", "3"),
+        ])
+
+        form = Form(request,
+                    validators=dict(name=ForEach(validators.NotEmpty())))
+        self.assert_(form.validate())
+        self.assertListEqual(form.data["name"], ["1", "2", "3"])
+
     def test_is_validated_on_post(self):
         from pyramid_simpleform import Form
 
