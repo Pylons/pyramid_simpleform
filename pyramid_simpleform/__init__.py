@@ -5,6 +5,12 @@ from formencode import Invalid
 from pyramid.i18n import get_localizer, TranslationStringFactory, TranslationString
 from pyramid.renderers import render
 
+try:
+    _text = basestring
+except NameError:
+    _text = str
+
+
 class State(object):
     """
     Default "empty" state object.
@@ -127,7 +133,7 @@ class Form(object):
         """
         Returns all errors in a single list.
         """
-        if isinstance(self.errors, basestring):
+        if isinstance(self.errors, _text):
             return [self.errors]
         if isinstance(self.errors, list):
             return self.errors
@@ -141,7 +147,7 @@ class Form(object):
         Returns any errors for a given field as a list.
         """
         errors = self.errors.get(field, [])
-        if isinstance(errors, basestring):
+        if isinstance(errors, _text):
             errors = [errors]
         return errors
 
@@ -175,15 +181,19 @@ class Form(object):
             if self.method and self.method != self.request.method:
                 return False
 
+        try:
+            json_body = self.request.json_body
+        except ValueError:
+            json_body = None
         if params is None:
-            if hasattr(self.request, 'json_body') and self.request.json_body:
-                params = self.request.json_body
+            if json_body:
+                params = json_body
             elif self.method == "POST":
                 params = self.request.POST
             else:
                 params = self.request.params
             
-        if self.variable_decode and not (hasattr(self.request, 'json_body') and self.request.json_body):
+        if self.variable_decode and not json_body:
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
 
@@ -197,7 +207,7 @@ class Form(object):
         if self.schema:
             try:
                 self.data = self.schema.to_python(decoded, self.state)
-            except Invalid, e:
+            except Invalid as e:
                 self.errors = e.unpack_errors(self.variable_decode,
                                               self.dict_char,
                                               self.list_char)
@@ -208,7 +218,7 @@ class Form(object):
                     self.data[field] = validator.to_python(decoded.get(field),
                                                            self.state)
 
-                except Invalid, e:
+                except Invalid as e:
                     self.errors[field] = unicode(e)
 
         self.is_validated = True
@@ -236,11 +246,11 @@ class Form(object):
         """
 
         if not self.is_validated:
-            raise RuntimeError, \
-                    "Form has not been validated. Call validate() first"
+            raise RuntimeError(
+                    "Form has not been validated. Call validate() first")
 
         if self.errors:
-            raise RuntimeError, "Cannot bind to object if form has errors"
+            raise RuntimeError("Cannot bind to object if form has errors")
 
         items = [(k, v) for k, v in self.data.items() if not k.startswith("_")]
         for k, v in items:

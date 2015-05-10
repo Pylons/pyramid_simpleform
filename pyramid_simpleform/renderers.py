@@ -1,6 +1,6 @@
 
-from webhelpers.html import tags
-from webhelpers.html.builder import HTML
+from webhelpers2.html import tags
+from webhelpers2.html.builder import HTML
 
 
 class Renderer(object):
