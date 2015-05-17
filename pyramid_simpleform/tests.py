@@ -558,6 +558,19 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         self.assert_(renderer.text("name") == \
                 '<input id="name" name="name" type="text" value="Fred" />')
 
+    def test_date(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+        import datetime
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={
+            "when" : datetime.date(2014, 02, 01) })
+        renderer = FormRenderer(form)
+
+        self.assert_(renderer.date("when", date_format="%d/%m/%Y") == \
+                '<input id="when" name="when" type="text" value="01/02/2014" />')
+
     def test_textarea(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
