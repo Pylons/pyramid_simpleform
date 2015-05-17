@@ -227,7 +227,12 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request,
                     validators=dict(name=ForEach(validators.NotEmpty())))
         self.assert_(form.validate())
-        self.assertListEqual(form.data["name"], ["1", "2", "3"])
+        if hasattr(self, 'assertListEqual'):
+            assertfn = self.assertListEqual
+        else:
+            assertfn = self.assertEqual
+
+        assertfn(form.data["name"], ["1", "2", "3"])
 
     def test_is_validated_on_post(self):
         from pyramid_simpleform import Form
