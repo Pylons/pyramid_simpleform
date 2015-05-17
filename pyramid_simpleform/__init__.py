@@ -192,7 +192,7 @@ class Form(object):
         if hasattr(decoded, "mixed"):
             decoded = decoded.mixed()
 
-        self.data.update(params)
+        self.data.update(decoded)
 
         if self.schema:
             try:

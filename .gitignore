@@ -24,6 +24,8 @@ docs/_build
 nosetests.xml
 pyramid_simpleform/coverage.xml
 
+env/
 env26/
 .tox/
+.eggs/
 coverage.xml
