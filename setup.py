@@ -12,9 +12,11 @@ except IOError:
 
 requires = [
     'pyramid',
-    'pyramid_mako',
     'WebHelpers',
     'FormEncode',
+]
+tests_require = requires + [
+    'pyramid_mako',
 ]
 
 setup(name='pyramid_simpleform',
@@ -36,7 +38,6 @@ setup(name='pyramid_simpleform',
       zip_safe=False,
       license="LICENSE.txt",
       install_requires=requires,
-      tests_require=requires,
+      tests_require=tests_require,
       test_suite="pyramid_simpleform",
       )
-
