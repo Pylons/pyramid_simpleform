@@ -112,10 +112,13 @@ class Form(object):
             self.data.update(defaults)
 
         if obj:
-            fields = self.schema.fields.keys() + self.validators.keys()
-            for f in fields:
-                if hasattr(obj, f):
-                    self.data[f] = getattr(obj, f)
+            fields = itertools.chain(self.schema.fields.iteritems(), self.validators.iteritems())
+            for name, validator in fields:
+                if hasattr(obj, name):
+                    try:
+                        self.data[name] = validator.from_python(getattr(obj, name) )
+                    except Invalid as e:
+                        self.data[name] = getattr(obj, name)
 
     def is_error(self, field):
         """
@@ -196,7 +199,8 @@ class Form(object):
 
         if self.schema:
             try:
-                self.data = self.schema.to_python(decoded, self.state)
+                self.data = self.schema.from_python(self.schema.to_python(decoded, self.state), self.state)
+                
             except Invalid, e:
                 self.errors = e.unpack_errors(self.variable_decode,
                                               self.dict_char,
@@ -205,8 +209,8 @@ class Form(object):
         if self.validators:
             for field, validator in self.validators.iteritems():
                 try:
-                    self.data[field] = validator.to_python(decoded.get(field),
-                                                           self.state)
+                    self.data[field] = validator.from_python(validator.to_python(decoded.get(field),
+                                                           self.state), self.state)
 
                 except Invalid, e:
                     self.errors[field] = unicode(e)
@@ -243,6 +247,7 @@ class Form(object):
             raise RuntimeError, "Cannot bind to object if form has errors"
 
         items = [(k, v) for k, v in self.data.items() if not k.startswith("_")]
+        fields = dict(itertools.chain(self.schema.fields.iteritems(), self.validators.iteritems()))
         for k, v in items:
 
             if include and k not in include:
@@ -250,6 +255,8 @@ class Form(object):
 
             if exclude and k in exclude:
                 continue
+            
+            v = fields[k].to_python(v)
 
             setattr(obj, k, v)
 
