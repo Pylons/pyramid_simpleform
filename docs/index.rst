@@ -47,7 +47,7 @@ Here is a typical (truncated) example::
         item = session.query(MyModel).get(item_id)
 
         form = Form(request, 
-                    schema=MyModelSchema(), 
+                    schema=MySchema(), 
                     obj=item)
 
         if form.validate():
@@ -66,7 +66,7 @@ Here is a typical (truncated) example::
         
         form = Form(request, 
                     defaults={"name" : "..."},
-                    schema=MyModelSchema())
+                    schema=MySchema())
 
         if form.validate():
 
@@ -124,7 +124,7 @@ Working with models
 
 First, you can pass the `obj` argument to the constructor, which can be used instead of `defaults` to set default values in your form::
 
-    form = Form(request, MyModelSchema(), obj=MyModel(name="foo"))
+    form = Form(request, MySchema(), obj=MyModel(name="foo"))
     assert form.data['name'] == 'foo'
 
 Second, the **bind()** method sets object properties from your form fields::
