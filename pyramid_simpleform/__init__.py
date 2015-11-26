@@ -5,6 +5,12 @@ from formencode import Invalid
 from pyramid.i18n import get_localizer, TranslationStringFactory, TranslationString
 from pyramid.renderers import render
 
+try:
+    _text = basestring
+except NameError:
+    _text = str
+
+
 class State(object):
     """
     Default "empty" state object.
@@ -112,7 +118,7 @@ class Form(object):
             self.data.update(defaults)
 
         if obj:
-            fields = self.schema.fields.keys() + self.validators.keys()
+            fields = list(self.schema.fields.keys()) + list(self.validators.keys())
             for f in fields:
                 if hasattr(obj, f):
                     self.data[f] = getattr(obj, f)
@@ -127,12 +133,17 @@ class Form(object):
         """
         Returns all errors in a single list.
         """
-        if isinstance(self.errors, basestring):
+        if isinstance(self.errors, _text):
             return [self.errors]
         if isinstance(self.errors, list):
             return self.errors
         errors = []
-        for field in self.errors.iterkeys():
+        try:
+            iter_keys = self.errors.iterkeys()
+        except AttributeError:
+            iter_keys = self.errors.keys()
+
+        for field in iter_keys:
             errors += self.errors_for(field)
         return errors
 
@@ -141,7 +152,7 @@ class Form(object):
         Returns any errors for a given field as a list.
         """
         errors = self.errors.get(field, [])
-        if isinstance(errors, basestring):
+        if isinstance(errors, _text):
             errors = [errors]
         return errors
 
@@ -175,15 +186,19 @@ class Form(object):
             if self.method and self.method != self.request.method:
                 return False
 
+        try:
+            json_body = self.request.json_body
+        except AttributeError:
+            json_body = None
         if params is None:
-            if hasattr(self.request, 'json_body') and self.request.json_body:
-                params = self.request.json_body
+            if json_body:
+                params = json_body
             elif self.method == "POST":
                 params = self.request.POST
             else:
                 params = self.request.params
             
-        if self.variable_decode and not (hasattr(self.request, 'json_body') and self.request.json_body):
+        if self.variable_decode and not json_body:
             decoded = variabledecode.variable_decode(
                         params, self.dict_char, self.list_char)
 
@@ -197,19 +212,28 @@ class Form(object):
         if self.schema:
             try:
                 self.data = self.schema.to_python(decoded, self.state)
-            except Invalid, e:
+            except Invalid as e:
                 self.errors = e.unpack_errors(self.variable_decode,
                                               self.dict_char,
                                               self.list_char)
 
         if self.validators:
-            for field, validator in self.validators.iteritems():
+            try:
+                iter_items = self.validators.iteritems()
+            except AttributeError:
+                iter_items = self.validators.items()
+
+            for field, validator in iter_items:
                 try:
                     self.data[field] = validator.to_python(decoded.get(field),
                                                            self.state)
 
-                except Invalid, e:
-                    self.errors[field] = unicode(e)
+                except Invalid as e:
+                    try:
+                        self.errors[field] = unicode(e)
+                    except NameError:
+                        self.errors[field] = str(e)
+
 
         self.is_validated = True
 
@@ -236,11 +260,10 @@ class Form(object):
         """
 
         if not self.is_validated:
-            raise RuntimeError, \
-                    "Form has not been validated. Call validate() first"
+            raise RuntimeError("Form has not been validated. Call validate() first")
 
         if self.errors:
-            raise RuntimeError, "Cannot bind to object if form has errors"
+            raise RuntimeError("Cannot bind to object if form has errors")
 
         items = [(k, v) for k, v in self.data.items() if not k.startswith("_")]
         for k, v in items:

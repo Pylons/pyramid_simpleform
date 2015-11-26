@@ -1,6 +1,7 @@
 import datetime
-from webhelpers.html import tags
-from webhelpers.html.builder import HTML
+from webhelpers2.html import tags
+from webhelpers2.html.tags import Option
+from webhelpers2.html.builder import HTML
 
 
 class Renderer(object):
@@ -97,10 +98,15 @@ class Renderer(object):
         """
         Outputs <select> element.
         """
+        if isinstance(options, list) or isinstance(options, tuple):
+            wh2_options = [Option(opt[0], opt[1]) for opt in options]
+        else:
+            wh2_options = options
+
         return tags.select(
             name, 
             self.value(name, selected_value), 
-            options, 
+            wh2_options, 
             self._get_id(id, name), 
             **attrs
         )
