@@ -98,16 +98,17 @@ class Renderer(object):
         """
         Outputs <select> element.
         """
-        if isinstance(options, list) or isinstance(options, tuple):
+        if options and (isinstance(options, list) or isinstance(options, tuple)) and \
+                isinstance(options[0], tuple):
             wh2_options = [Option(opt[0], opt[1]) for opt in options]
         else:
             wh2_options = options
 
         return tags.select(
-            name, 
-            self.value(name, selected_value), 
-            wh2_options, 
-            self._get_id(id, name), 
+            name,
+            self.value(name, selected_value),
+            wh2_options,
+            self._get_id(id, name),
             **attrs
         )
 

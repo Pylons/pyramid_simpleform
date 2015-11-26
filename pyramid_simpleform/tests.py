@@ -3,6 +3,7 @@ import unittest
 import formencode
 from formencode import Schema
 from formencode import validators
+from webhelpers2.html.tags import Option, Options, OptGroup
 
 from pyramid import testing
 from pyramid.config import Configurator
@@ -631,6 +632,79 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         self.assertTrue(renderer.select("name", options) == \
             """<select id="name" name="name">
+<option selected="selected" value="Fred">Fred</option>
+<option value="Barney">Barney</option>
+<option value="Wilma">Wilma</option>
+<option value="Betty">Betty</option>
+</select>""")
+        
+    def test_select_with_tuple(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+        
+        options = (
+            ("Fred", "Fred"),
+            ("Barney", "Barney"),
+            ("Wilma", "Wilma"),
+            ("Betty", "Betty"),
+        )
+
+        self.assertTrue(renderer.select("name", options) == \
+            """<select id="name" name="name">
+<option selected="selected" value="Fred">Fred</option>
+<option value="Barney">Barney</option>
+<option value="Wilma">Wilma</option>
+<option value="Betty">Betty</option>
+</select>""")
+        
+    def test_select_with_options_list(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+        
+        options = [
+            Option("Fred", "Fred"),
+            Option("Barney", "Barney"),
+            Option("Wilma", "Wilma"),
+            Option("Betty", "Betty"),
+        ]   
+
+        self.assertTrue(renderer.select("name", options) == \
+            """<select id="name" name="name">
+<option selected="selected" value="Fred">Fred</option>
+<option value="Barney">Barney</option>
+<option value="Wilma">Wilma</option>
+<option value="Betty">Betty</option>
+</select>""")
+        
+    def test_select_with_options_obj(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        renderer = FormRenderer(form)
+        
+        options = Options([
+            OptGroup("OptGroup", [Option("og1", "og1")]),
+            Option("Fred", "Fred"),
+            Option("Barney", "Barney"),
+            Option("Wilma", "Wilma"),
+            Option("Betty", "Betty"),
+        ])
+        
+        self.assertTrue(renderer.select("name", options) == \
+            """<select id="name" name="name">
+<optgroup label="OptGroup">
+<option value="og1">og1</option>
+</optgroup>
 <option selected="selected" value="Fred">Fred</option>
 <option value="Barney">Barney</option>
 <option value="Wilma">Wilma</option>
