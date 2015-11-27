@@ -107,23 +107,6 @@ class Renderer(object):
         Outputs <select> element.
         """
 
-        try:
-            unicode_ = unicode
-            basestring_ = basestring
-            long_ = long
-        except NameError:
-            unicode_ = basestring_ = str
-            long_ = int
-
-        # Accept None as selected_values meaning that no option is selected
-        if selected_value is None:
-            selected_value = ("",)
-        # Turn a single string or integer into a list
-        elif isinstance(selected_value, (basestring_, int, long_)):
-            selected_value = (selected_value,)
-        # Cast integer values to strings
-        selected_value = [unicode_(val) for val in selected_value]  # For compatibility with webhelpers1
-
         def parse_options(options):                                 # For compatibility with webhelpers1
             opts = []
             for opt in options:
@@ -137,10 +120,7 @@ class Renderer(object):
                         continue
                 else:
                     value = label = opt
-                if not isinstance(value, unicode_):
-                    value = unicode_(value)
-                if not isinstance(label, unicode_):  # Preserves literal.
-                    label = unicode_(label)
+
                 opt = Option(label=label, value=value)
                 opts.append(opt)
             return opts
