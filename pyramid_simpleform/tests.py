@@ -3,8 +3,11 @@ import unittest
 import formencode
 from formencode import Schema
 from formencode import validators
-from webhelpers2.html.tags import Option, Options, OptGroup
-from webhelpers2.html import literal
+
+try:
+    from webhelpers2.html.tags import Option, Options, OptGroup
+except ImportError:
+    from webhelpers.html.tags import Option, Options, OptGroup
 
 from pyramid import testing
 from pyramid.config import Configurator
@@ -736,10 +739,10 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         options = [
-            Option("ValueFred", "LabelFred"),
-            Option("ValueBarney", "LabelBarney"),
-            Option("ValueWilma", "LabelWilma"),
-            Option("ValueBetty", "LabelBetty"),
+            Option(value="ValueFred", label="LabelFred"),
+            Option(value="ValueBarney", label="LabelBarney"),
+            Option(value="ValueWilma", label="LabelWilma"),
+            Option(value="ValueBetty", label="LabelBetty"),
         ]
 
         self.assertTrue(renderer.select("name", options) ==
@@ -759,11 +762,11 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         renderer = FormRenderer(form)
 
         options = Options([
-            OptGroup("OptGroup", [Option("ValueOG", "LabelOG")]),
-            Option("ValueFred", "LabelFred"),
-            Option("ValueBarney", "LabelBarney"),
-            Option("ValueWilma", "LabelWilma"),
-            Option("ValueBetty", "LabelBetty"),
+            OptGroup("OptGroup", [Option(value="ValueOG", label="LabelOG")]),
+            Option(value="ValueFred", label="LabelFred"),
+            Option(value="ValueBarney", label="LabelBarney"),
+            Option(value="ValueWilma", label="LabelWilma"),
+            Option(value="ValueBetty", label="LabelBetty"),
         ])
 
         self.assertTrue(renderer.select("name", options) ==

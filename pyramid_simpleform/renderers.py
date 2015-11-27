@@ -1,7 +1,15 @@
 import datetime
-from webhelpers2.html import tags
-from webhelpers2.html.tags import Option, OptGroup
-from webhelpers2.html.builder import HTML
+try:
+    from webhelpers2.html import tags
+    from webhelpers2.html.tags import Option, OptGroup
+    from webhelpers2.html.builder import HTML
+    OLD_WEBHELPERS = False
+except ImportError:
+    OLD_WEBHELPERS = True
+    from webhelpers.html import tags
+    from webhelpers.html.tags import Option, OptGroup
+    from webhelpers.html.builder import HTML
+
 
 
 class Renderer(object):
@@ -98,6 +106,7 @@ class Renderer(object):
         """
         Outputs <select> element.
         """
+
         try:
             unicode_ = unicode
             basestring_ = basestring
@@ -113,17 +122,13 @@ class Renderer(object):
         elif isinstance(selected_value, (basestring_, int, long_)):
             selected_value = (selected_value,)
         # Cast integer values to strings
-        selected_value = [unicode_(val) for val in selected_value]
+        selected_value = [unicode_(val) for val in selected_value]  # For compatibility with webhelpers1
 
-        def parse_options(options):
+        def parse_options(options):                                 # For compatibility with webhelpers1
             opts = []
             for opt in options:
-                if isinstance(opt, Option):
-                    opt.value, opt.label = opt.label, opt.value
+                if isinstance(opt, (Option, OptGroup)):
                     opts.append(opt)
-                    continue
-                if isinstance(opt, OptGroup):
-                    opts.append(OptGroup(opt.label, parse_options(list(opt))))
                     continue
                 if isinstance(opt, (list, tuple)):
                     value, label = opt[:2]
@@ -136,11 +141,15 @@ class Renderer(object):
                     value = unicode_(value)
                 if not isinstance(label, unicode_):  # Preserves literal.
                     label = unicode_(label)
-                opt = Option(label, value)
+                opt = Option(label=label, value=value)
                 opts.append(opt)
             return opts
-        wh2_options = parse_options(options)
-        
+
+        if OLD_WEBHELPERS:
+            wh2_options = options
+        else:
+            wh2_options = parse_options(options)
+
         return tags.select(
             name,
             self.value(name, selected_value),
