@@ -4,6 +4,7 @@ import formencode
 from formencode import Schema
 from formencode import validators
 from webhelpers2.html.tags import Option, Options, OptGroup
+from webhelpers2.html import literal
 
 from pyramid import testing
 from pyramid.config import Configurator
@@ -603,7 +604,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         self.assertTrue(renderer.textarea("name") == \
                 '<textarea id="name" name="name">Fred</textarea>')
- 
+
     def test_hidden(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
@@ -614,103 +615,168 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         self.assertTrue(renderer.hidden("name") == \
                 '<input id="name" name="name" type="hidden" value="Fred" />')
-        
+
     def test_select(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
         renderer = FormRenderer(form)
-        
+
         options = [
             ("Fred", "Fred"),
             ("Barney", "Barney"),
             ("Wilma", "Wilma"),
             ("Betty", "Betty"),
-        ]   
+        ]
 
-        self.assertTrue(renderer.select("name", options) == \
+        self.assertTrue(renderer.select("name", options) ==
             """<select id="name" name="name">
 <option selected="selected" value="Fred">Fred</option>
 <option value="Barney">Barney</option>
 <option value="Wilma">Wilma</option>
 <option value="Betty">Betty</option>
 </select>""")
-        
+
+    def test_select_webhelpers1_compatible(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
+        renderer = FormRenderer(form)
+
+        self.assertTrue(renderer.select("currency", [["$", "Dollar"], ["DKK", "Kroner"]], "$") ==
+                        """<select id="currency" name="currency">
+<option selected="selected" value="$">Dollar</option>
+<option value="DKK">Kroner</option>
+</select>""")
+        self.assertTrue(renderer.select("cc", ["VISA", "MasterCard"], "MasterCard", id="cc", class_="blue") ==
+                        """<select class="blue" id="cc" name="cc">
+<option value="VISA">VISA</option>
+<option selected="selected" value="MasterCard">MasterCard</option>
+</select>""")
+        self.assertTrue(renderer.select("cc", ["VISA", "MasterCard", "Discover"], ["VISA", "Discover"]) ==
+                        """<select id="cc" name="cc">
+<option selected="selected" value="VISA">VISA</option>
+<option value="MasterCard">MasterCard</option>
+<option selected="selected" value="Discover">Discover</option>
+</select>""")
+        self.assertTrue(renderer.select("currency",
+                                        [["$", "Dollar"], ["DKK", "Kroner"]], None, prompt="Please choose ...") ==
+                        """<select id="currency" name="currency">
+<option selected="selected" value="">Please choose ...</option>
+<option value="$">Dollar</option>
+<option value="DKK">Kroner</option>
+</select>""")
+
+        try:
+            if isinstance(long, type):
+                self.assertTrue(renderer.select("privacy",
+                                                [(1, "Private"), (2, "Semi-public"), (3, "Public")], long(3)) ==
+                                """<select id="privacy" name="privacy">
+<option value="1">Private</option>
+<option value="2">Semi-public</option>
+<option selected="selected" value="3">Public</option>
+</select>""")
+        except NameError:
+                self.assertTrue(renderer.select("privacy", [(1, "Private"), (2, "Semi-public"), (3, "Public")], 3) ==
+                                """<select id="privacy" name="privacy">
+<option value="1">Private</option>
+<option value="2">Semi-public</option>
+<option selected="selected" value="3">Public</option>
+</select>""")
+
+        self.assertTrue(renderer.select("recipients", 
+                                        [([("u1", "User1"),
+                                           ("u2", "User2")], "Users"),
+                                         ([("g1", "Group1"),
+                                           ("g2", "Group2")], "Groups")], None) ==
+                        """<select id="recipients" name="recipients">
+<optgroup label="Users">
+<option value="u1">User1</option>
+<option value="u2">User2</option>
+</optgroup>
+<optgroup label="Groups">
+<option value="g1">Group1</option>
+<option value="g2">Group2</option>
+</optgroup>
+</select>""")
+
     def test_select_with_tuple(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
         renderer = FormRenderer(form)
-        
+
         options = (
             ("Fred", "Fred"),
-            ("Barney", "Barney"),
+            Option("Barney", "Barney"),
             ("Wilma", "Wilma"),
             ("Betty", "Betty"),
         )
 
-        self.assertTrue(renderer.select("name", options) == \
-            """<select id="name" name="name">
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
 <option selected="selected" value="Fred">Fred</option>
 <option value="Barney">Barney</option>
 <option value="Wilma">Wilma</option>
 <option value="Betty">Betty</option>
 </select>""")
-        
+
     def test_select_with_options_list(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        form = Form(request, SimpleFESchema, defaults={"name": "ValueFred"})
         renderer = FormRenderer(form)
-        
-        options = [
-            Option("Fred", "Fred"),
-            Option("Barney", "Barney"),
-            Option("Wilma", "Wilma"),
-            Option("Betty", "Betty"),
-        ]   
 
-        self.assertTrue(renderer.select("name", options) == \
-            """<select id="name" name="name">
-<option selected="selected" value="Fred">Fred</option>
-<option value="Barney">Barney</option>
-<option value="Wilma">Wilma</option>
-<option value="Betty">Betty</option>
+        options = [
+            Option("ValueFred", "LabelFred"),
+            Option("ValueBarney", "LabelBarney"),
+            Option("ValueWilma", "LabelWilma"),
+            Option("ValueBetty", "LabelBetty"),
+        ]
+
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
+<option selected="selected" value="ValueFred">LabelFred</option>
+<option value="ValueBarney">LabelBarney</option>
+<option value="ValueWilma">LabelWilma</option>
+<option value="ValueBetty">LabelBetty</option>
 </select>""")
-        
+
     def test_select_with_options_obj(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        form = Form(request, SimpleFESchema, defaults={"name": "ValueFred"})
         renderer = FormRenderer(form)
-        
+
         options = Options([
-            OptGroup("OptGroup", [Option("og1", "og1")]),
-            Option("Fred", "Fred"),
-            Option("Barney", "Barney"),
-            Option("Wilma", "Wilma"),
-            Option("Betty", "Betty"),
+            OptGroup("OptGroup", [Option("ValueOG", "LabelOG")]),
+            Option("ValueFred", "LabelFred"),
+            Option("ValueBarney", "LabelBarney"),
+            Option("ValueWilma", "LabelWilma"),
+            Option("ValueBetty", "LabelBetty"),
         ])
-        
-        self.assertTrue(renderer.select("name", options) == \
-            """<select id="name" name="name">
+
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
 <optgroup label="OptGroup">
-<option value="og1">og1</option>
+<option value="ValueOG">LabelOG</option>
 </optgroup>
-<option selected="selected" value="Fred">Fred</option>
-<option value="Barney">Barney</option>
-<option value="Wilma">Wilma</option>
-<option value="Betty">Betty</option>
+<option selected="selected" value="ValueFred">LabelFred</option>
+<option value="ValueBarney">LabelBarney</option>
+<option value="ValueWilma">LabelWilma</option>
+<option value="ValueBetty">LabelBetty</option>
 </select>""")
- 
+
     def test_file(self):
   
         from pyramid_simpleform import Form
@@ -720,8 +786,8 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assertTrue(renderer.file('file') == \
-                   '<input id="file" name="file" type="file" />')
+        self.assertTrue(renderer.file('file') ==
+                        '<input id="file" name="file" type="file" />')
 
     def test_password(self):
   
@@ -732,8 +798,8 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assertTrue(renderer.password('password') == \
-                   '<input id="password" name="password" type="password" />')
+        self.assertTrue(renderer.password('password') ==
+                        '<input id="password" name="password" type="password" />')
 
 
     def test_radio(self):

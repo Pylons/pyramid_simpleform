@@ -1,6 +1,6 @@
 import datetime
 from webhelpers2.html import tags
-from webhelpers2.html.tags import Option
+from webhelpers2.html.tags import Option, OptGroup
 from webhelpers2.html.builder import HTML
 
 
@@ -98,12 +98,49 @@ class Renderer(object):
         """
         Outputs <select> element.
         """
-        if options and (isinstance(options, list) or isinstance(options, tuple)) and \
-                isinstance(options[0], tuple):
-            wh2_options = [Option(opt[0], opt[1]) for opt in options]
-        else:
-            wh2_options = options
+        try:
+            unicode_ = unicode
+            basestring_ = basestring
+            long_ = long
+        except NameError:
+            unicode_ = basestring_ = str
+            long_ = int
 
+        # Accept None as selected_values meaning that no option is selected
+        if selected_value is None:
+            selected_value = ("",)
+        # Turn a single string or integer into a list
+        elif isinstance(selected_value, (basestring_, int, long_)):
+            selected_value = (selected_value,)
+        # Cast integer values to strings
+        selected_value = [unicode_(val) for val in selected_value]
+
+        def parse_options(options):
+            opts = []
+            for opt in options:
+                if isinstance(opt, Option):
+                    opt.value, opt.label = opt.label, opt.value
+                    opts.append(opt)
+                    continue
+                if isinstance(opt, OptGroup):
+                    opts.append(OptGroup(opt.label, parse_options(list(opt))))
+                    continue
+                if isinstance(opt, (list, tuple)):
+                    value, label = opt[:2]
+                    if isinstance(value, (list, tuple)):  # It's an optgroup
+                        opts.append(OptGroup(label, parse_options(value)))
+                        continue
+                else:
+                    value = label = opt
+                if not isinstance(value, unicode_):
+                    value = unicode_(value)
+                if not isinstance(label, unicode_):  # Preserves literal.
+                    label = unicode_(label)
+                opt = Option(label, value)
+                opts.append(opt)
+            return opts
+        wh2_options = parse_options(options)
+        
         return tags.select(
             name,
             self.value(name, selected_value),
