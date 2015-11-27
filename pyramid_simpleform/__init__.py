@@ -188,7 +188,7 @@ class Form(object):
 
         try:
             json_body = self.request.json_body
-        except AttributeError:
+        except (AttributeError, ValueError):
             json_body = None
         if params is None:
             if json_body:
