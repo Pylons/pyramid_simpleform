@@ -91,7 +91,7 @@ class Form(object):
     def __init__(self, request, schema=None, validators=None, defaults=None, 
                  obj=None, extra=None, include=None, exclude=None, state=None, 
                  method="POST", variable_decode=False,  dict_char=".", 
-                 list_char="-", multipart=False):
+                 list_char="-", multipart=False, from_python=False):
 
         self.request = request
         self.schema = schema
@@ -122,6 +122,9 @@ class Form(object):
             for f in fields:
                 if hasattr(obj, f):
                     self.data[f] = getattr(obj, f)
+                    
+        if schema and from_python:
+            self.data.update(schema.from_python(self.data))
 
     def is_error(self, field):
         """
