@@ -1,6 +1,15 @@
 import datetime
-from webhelpers.html import tags
-from webhelpers.html.builder import HTML
+try:
+    from webhelpers2.html import tags
+    from webhelpers2.html.tags import Option, OptGroup
+    from webhelpers2.html.builder import HTML
+    OLD_WEBHELPERS = False
+except ImportError:
+    OLD_WEBHELPERS = True
+    from webhelpers.html import tags
+    from webhelpers.html.tags import Option, OptGroup
+    from webhelpers.html.builder import HTML
+
 
 
 class Renderer(object):
@@ -97,11 +106,35 @@ class Renderer(object):
         """
         Outputs <select> element.
         """
+
+        def parse_options(options):                                 # For compatibility with webhelpers1
+            opts = []
+            for opt in options:
+                if isinstance(opt, (Option, OptGroup)):
+                    opts.append(opt)
+                    continue
+                if isinstance(opt, (list, tuple)):
+                    value, label = opt[:2]
+                    if isinstance(value, (list, tuple)):  # It's an optgroup
+                        opts.append(OptGroup(label, parse_options(value)))
+                        continue
+                else:
+                    value = label = opt
+
+                opt = Option(label=label, value=value)
+                opts.append(opt)
+            return opts
+
+        if OLD_WEBHELPERS:
+            wh2_options = options
+        else:
+            wh2_options = parse_options(options)
+
         return tags.select(
-            name, 
-            self.value(name, selected_value), 
-            options, 
-            self._get_id(id, name), 
+            name,
+            self.value(name, selected_value),
+            wh2_options,
+            self._get_id(id, name),
             **attrs
         )
 

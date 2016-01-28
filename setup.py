@@ -1,6 +1,8 @@
 import os
 
 from setuptools import setup, find_packages
+import platform
+import pkg_resources
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -10,11 +12,27 @@ try:
 except IOError:
     README = CHANGES = ''
 
+
+def package_installed(pkg):
+    """Check if package is installed"""
+    req = pkg_resources.Requirement.parse(pkg)
+    try:
+        pkg_resources.get_provider(req)
+    except pkg_resources.DistributionNotFound:
+        return False
+    else:
+        return True
+
 requires = [
     'pyramid',
-    'WebHelpers',
     'FormEncode',
 ]
+
+if package_installed('WebHelpers2') or platform.python_version_tuple() >= ('3',):
+    requires.append('WebHelpers2')
+else:
+    requires.append('WebHelpers')
+
 tests_require = requires + [
     'pyramid_mako',
 ]

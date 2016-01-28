@@ -4,6 +4,11 @@ import formencode
 from formencode import Schema
 from formencode import validators
 
+try:
+    from webhelpers2.html.tags import Option, Options, OptGroup
+except ImportError:
+    from webhelpers.html.tags import Option, Options, OptGroup
+
 from pyramid import testing
 from pyramid.config import Configurator
 
@@ -26,25 +31,25 @@ class TestState(unittest.TestCase):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
-        self.assert_(obj.foo=="bar")
+        self.assertTrue(obj.foo=="bar")
 
     def test_state_contains(self):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
-        self.assert_("foo" in obj)
+        self.assertTrue("foo" in obj)
 
     def test_state_not_contains(self):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
-        self.assert_("bar" not in obj)
+        self.assertTrue("bar" not in obj)
 
     def test_getitem(self):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
-        self.assert_(obj['foo'] == 'bar')
+        self.assertTrue(obj['foo'] == 'bar')
 
     def test_getitem_notfound(self):
 
@@ -57,15 +62,15 @@ class TestState(unittest.TestCase):
         from pyramid_simpleform import State
         obj = State()
         obj['foo'] = "bar"
-        self.assert_(obj['foo'] == 'bar')
-        self.assert_(obj.foo == 'bar')
+        self.assertTrue(obj['foo'] == 'bar')
+        self.assertTrue(obj.foo == 'bar')
 
     def test_get(self):
 
         from pyramid_simpleform import State
         obj = State(foo="bar")
-        self.assert_(obj.get('foo') == 'bar')
-        self.assert_(obj.get('bar', 'foo') == 'foo')
+        self.assertTrue(obj.get('foo') == 'bar')
+        self.assertTrue(obj.get('bar', 'foo') == 'foo')
 
 
 class TestFormencodeForm(unittest.TestCase):
@@ -78,9 +83,9 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not(form.validate()))
-        self.assert_(form.is_validated)
-        self.assert_('name' in form.errors)
+        self.assertTrue(not(form.validate()))
+        self.assertTrue(form.is_validated)
+        self.assertTrue('name' in form.errors)
 
     def test_all_errors_with_single_string(self):
 
@@ -91,7 +96,7 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
         form.errors = u"Name is missing"
-        self.assert_(form.all_errors() == [u"Name is missing"])
+        self.assertTrue(form.all_errors() == [u"Name is missing"])
 
     def test_all_errors_with_list(self):
 
@@ -102,7 +107,7 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
         form.errors = [u"Name is missing"]
-        self.assert_(form.all_errors() == [u"Name is missing"])
+        self.assertTrue(form.all_errors() == [u"Name is missing"])
 
     def test_ok_with_jsonbody(self):
 
@@ -115,7 +120,7 @@ class TestFormencodeForm(unittest.TestCase):
         request.json_body = json.loads('{"name" : "ok"}')
         
         form = Form(request, SimpleFESchema)
-        self.assert_(form.validate())
+        self.assertTrue(form.validate())
 
     def test_error_with_jsonbody(self):
 
@@ -130,7 +135,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.errors = {"name" : [u"Name is missing"],
                        "value" : u"Value is missing"}
-        self.assert_(sorted(form.all_errors()) == sorted([
+        self.assertTrue(sorted(form.all_errors()) == sorted([
             u"Name is missing", 
             u"Value is missing"]))
 
@@ -145,7 +150,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.errors = {"name" : [u"Name is missing"],
                        "value" : u"Value is missing"}
-        self.assert_(sorted(form.all_errors()) == sorted([
+        self.assertTrue(sorted(form.all_errors()) == sorted([
             u"Name is missing", 
             u"Value is missing"]))
 
@@ -157,11 +162,11 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not(form.validate()))
-        self.assert_(form.is_validated)
-        self.assert_('name' in form.errors)
+        self.assertTrue(not(form.validate()))
+        self.assertTrue(form.is_validated)
+        self.assertTrue('name' in form.errors)
 
-        self.assert_(form.errors_for('name') == ['Missing value'])
+        self.assertTrue(form.errors_for('name') == ['Missing value'])
 
     def test_validate_twice(self):
         
@@ -174,15 +179,15 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, 
                     validators=dict(name=validators.NotEmpty()))
 
-        self.assert_(form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.data['name'] == 'ok')
+        self.assertTrue(form.validate())
+        self.assertTrue(form.is_validated)
+        self.assertTrue(form.data['name'] == 'ok')
 
         request.POST = {'name' : 'ok again'}
 
-        self.assert_(form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.data['name'] == 'ok')
+        self.assertTrue(form.validate())
+        self.assertTrue(form.is_validated)
+        self.assertTrue(form.data['name'] == 'ok')
 
     def test_validate_good_input_with_validators(self):
         from pyramid_simpleform import Form
@@ -194,9 +199,9 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, 
                     validators=dict(name=validators.NotEmpty()))
 
-        self.assert_(form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.data['name'] == 'ok')
+        self.assertTrue(form.validate())
+        self.assertTrue(form.is_validated)
+        self.assertTrue(form.data['name'] == 'ok')
 
     def test_validate_bad_input_with_validators(self):
         from pyramid_simpleform import Form
@@ -207,11 +212,11 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, 
                     validators=dict(name=validators.NotEmpty()))
 
-        self.assert_(not form.validate())
-        self.assert_(form.is_validated)
-        self.assert_(form.is_error('name'))
+        self.assertTrue(not form.validate())
+        self.assertTrue(form.is_validated)
+        self.assertTrue(form.is_error('name'))
 
-        self.assert_(form.errors_for('name') == ['Please enter a value'])
+        self.assertTrue(form.errors_for('name') == ['Please enter a value'])
 
     def test_foreach_with_validators_and_multidict(self):
         from formencode import ForEach
@@ -228,7 +233,7 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request,
                     validators=dict(name=ForEach(validators.NotEmpty())))
-        self.assert_(form.validate())
+        self.assertTrue(form.validate())
         if hasattr(self, 'assertListEqual'):
             assertfn = self.assertListEqual
         else:
@@ -244,8 +249,8 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not(form.validate()))
-        self.assert_(form.is_validated)
+        self.assertTrue(not(form.validate()))
+        self.assertTrue(form.is_validated)
 
     def test_is_validated_with_specified_params(self):
         from pyramid_simpleform import Form
@@ -256,7 +261,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.validate(params={'name' : 'foo'})
         obj = form.bind(SimpleObj())
-        self.assert_(obj.name == 'foo')
+        self.assertTrue(obj.name == 'foo')
  
     def test_bind(self):
         from pyramid_simpleform import Form
@@ -268,7 +273,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.validate()
         obj = form.bind(SimpleObj())
-        self.assert_(obj.name == 'test')
+        self.assertTrue(obj.name == 'test')
 
     def test_bind_ignore_underscores(self):
         from pyramid_simpleform import Form
@@ -287,8 +292,8 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchemaWithPrivate)
         form.validate()
         obj = form.bind(SimpleObjWithPrivate())
-        self.assert_(obj.name == 'test')
-        self.assert_(obj._ignoreme is None)
+        self.assertTrue(obj.name == 'test')
+        self.assertTrue(obj._ignoreme is None)
         
     def test_bind_not_validated_yet(self):
         from pyramid_simpleform import Form
@@ -308,7 +313,7 @@ class TestFormencodeForm(unittest.TestCase):
         request.POST['name'] = ''
 
         form = Form(request, SimpleFESchema)
-        self.assert_(not form.validate())
+        self.assertTrue(not form.validate())
         self.assertRaises(RuntimeError, form.bind, SimpleObj())
 
     def test_bind_with_exclude(self):
@@ -321,7 +326,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.validate()
         obj = form.bind(SimpleObj(), exclude=["name"])
-        self.assert_(obj.name == None)
+        self.assertTrue(obj.name == None)
  
     def test_bind_with_include(self):
         from pyramid_simpleform import Form
@@ -333,7 +338,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         form.validate()
         obj = form.bind(SimpleObj(), include=['foo'])
-        self.assert_(obj.name == None)
+        self.assertTrue(obj.name == None)
  
     def test_initialize_with_obj(self):
         from pyramid_simpleform import Form
@@ -341,7 +346,7 @@ class TestFormencodeForm(unittest.TestCase):
         request = testing.DummyRequest()
         form = Form(request, SimpleFESchema, obj=SimpleObj(name='test'))
 
-        self.assert_(form.data['name'] == 'test')
+        self.assertTrue(form.data['name'] == 'test')
 
     def test_initialize_with_defaults(self):
         from pyramid_simpleform import Form
@@ -349,7 +354,7 @@ class TestFormencodeForm(unittest.TestCase):
         request = testing.DummyRequest()
         form = Form(request, SimpleFESchema, defaults={'name' : 'test'})
 
-        self.assert_(form.data['name'] == 'test')
+        self.assertTrue(form.data['name'] == 'test')
 
     def test_initialize_with_obj_and_defaults(self):
         from pyramid_simpleform import Form
@@ -359,7 +364,7 @@ class TestFormencodeForm(unittest.TestCase):
                     obj=SimpleObj(name='test1'),
                     defaults={'name' : 'test2'})
 
-        self.assert_(form.data['name'] == 'test1')
+        self.assertTrue(form.data['name'] == 'test1')
 
     def test_variable_decode(self):
         from pyramid_simpleform import Form
@@ -374,8 +379,8 @@ class TestFormencodeForm(unittest.TestCase):
                     variable_decode=True)
 
         self.assertTrue(form.validate())
-        self.assertEquals(form.data['name'], 'test')
-        self.assertEquals(form.data['names'], ['test1', 'test2'])
+        self.assertEqual(form.data['name'], 'test')
+        self.assertEqual(form.data['names'], ['test1', 'test2'])
 
     def test_variable_decode_with_error(self):
         from pyramid_simpleform import Form
@@ -390,8 +395,8 @@ class TestFormencodeForm(unittest.TestCase):
                     variable_decode=True)
 
         self.assertFalse(form.validate())
-        self.assertEquals(form.data['name'], '')
-        self.assertEquals(form.data['names'], ['test1', 'test2'])
+        self.assertEqual(form.data['name'], '')
+        self.assertEqual(form.data['names'], ['test1', 'test2'])
 
     def test_validate_from_GET(self):
         from pyramid_simpleform import Form
@@ -402,8 +407,8 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema, method="GET")
 
-        self.assert_(form.validate())
-        self.assert_(form.is_validated)
+        self.assertTrue(form.validate())
+        self.assertTrue(form.is_validated)
 
     def test_validate_from_GET_if_on_POST(self):
         from pyramid_simpleform import Form
@@ -414,8 +419,8 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not form.validate())
-        self.assert_(not form.is_validated)
+        self.assertTrue(not form.validate())
+        self.assertTrue(not form.is_validated)
 
 
     def test_force_validate(self):
@@ -426,8 +431,8 @@ class TestFormencodeForm(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(form.validate(force_validate=True))
-        self.assert_(form.is_validated)
+        self.assertTrue(form.validate(force_validate=True))
+        self.assertTrue(form.is_validated)
  
     def test_render_without_htmlfill(self):
 
@@ -449,7 +454,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema)
 
         result = form.render("test_form.mako", htmlfill=False)
-        self.assert_('<input type="text" name="name" size="20">' 
+        self.assertTrue('<input type="text" name="name" size="20">' 
                      in result)
 
 
@@ -473,7 +478,7 @@ class TestFormencodeForm(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={'name': 'foo'})
 
         result = form.render("test_form.mako", htmlfill=True)
-        self.assert_('<input type="text" name="name" size="20" value="foo">'
+        self.assertTrue('<input type="text" name="name" size="20" value="foo">'
                      in result)
 
 
@@ -491,7 +496,7 @@ class TestFormencodeForm(unittest.TestCase):
         """
 
         html = form.htmlfill(html)
-        self.assert_('value="testing"' in html)
+        self.assertTrue('value="testing"' in html)
 
 
 class TestFormencodeFormRenderer(unittest.TestCase):
@@ -504,7 +509,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.begin(url="/"),
+        self.assertTrue(renderer.begin(url="/"),
                      '<form action="/" method="post">')
 
     def test_end_form(self):
@@ -536,7 +541,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.csrf_token() == \
+        self.assertTrue(renderer.csrf_token() == \
                 '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="0123456789012345678901234567890123456789" /></div>')
 
@@ -549,7 +554,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={'name':'foo'})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.hidden_tag('name') == \
+        self.assertTrue(renderer.hidden_tag('name') == \
             '<div style="display:none;"><input id="name" name="name" '
             'type="hidden" value="foo" /><input id="_csrf" name="_csrf" '
             'type="hidden" value="0123456789012345678901234567890123456789" /></div>')
@@ -563,7 +568,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.hidden_tag() == \
+        self.assertTrue(renderer.hidden_tag() == \
                 '<div style="display:none;"><input id="_csrf" name="_csrf" '
                 'type="hidden" value="0123456789012345678901234567890123456789" /></div>')
 
@@ -576,7 +581,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.text("name") == \
+        self.assertTrue(renderer.text("name") == \
                 '<input id="name" name="name" type="text" value="Fred" />')
 
     def test_date(self):
@@ -586,10 +591,10 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         request = testing.DummyRequest()
         form = Form(request, SimpleFESchema, defaults={
-            "when" : datetime.date(2014, 02, 01) })
+            "when" : datetime.date(2014,2,1) })
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.date("when", date_format="%d/%m/%Y") == \
+        self.assertTrue(renderer.date("when", date_format="%d/%m/%Y") == \
                 '<input id="when" name="when" type="text" value="01/02/2014" />')
 
     def test_textarea(self):
@@ -600,9 +605,9 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.textarea("name") == \
+        self.assertTrue(renderer.textarea("name") == \
                 '<textarea id="name" name="name">Fred</textarea>')
- 
+
     def test_hidden(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
@@ -611,32 +616,170 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.hidden("name") == \
+        self.assertTrue(renderer.hidden("name") == \
                 '<input id="name" name="name" type="hidden" value="Fred" />')
-        
+
     def test_select(self):
         from pyramid_simpleform import Form
         from pyramid_simpleform.renderers import FormRenderer
 
         request = testing.DummyRequest()
-        form = Form(request, SimpleFESchema, defaults={"name" : "Fred"})
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
         renderer = FormRenderer(form)
-        
+
         options = [
             ("Fred", "Fred"),
             ("Barney", "Barney"),
             ("Wilma", "Wilma"),
             ("Betty", "Betty"),
-        ]   
+        ]
 
-        self.assert_(renderer.select("name", options) == \
+        self.assertTrue(renderer.select("name", options) ==
             """<select id="name" name="name">
 <option selected="selected" value="Fred">Fred</option>
 <option value="Barney">Barney</option>
 <option value="Wilma">Wilma</option>
 <option value="Betty">Betty</option>
 </select>""")
- 
+
+    def test_select_webhelpers1_compatible(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
+        renderer = FormRenderer(form)
+
+        self.assertTrue(renderer.select("currency", [["$", "Dollar"], ["DKK", "Kroner"]], "$") ==
+                        """<select id="currency" name="currency">
+<option selected="selected" value="$">Dollar</option>
+<option value="DKK">Kroner</option>
+</select>""")
+        self.assertTrue(renderer.select("cc", ["VISA", "MasterCard"], "MasterCard", id="cc", class_="blue") ==
+                        """<select class="blue" id="cc" name="cc">
+<option value="VISA">VISA</option>
+<option selected="selected" value="MasterCard">MasterCard</option>
+</select>""")
+        self.assertTrue(renderer.select("cc", ["VISA", "MasterCard", "Discover"], ["VISA", "Discover"]) ==
+                        """<select id="cc" name="cc">
+<option selected="selected" value="VISA">VISA</option>
+<option value="MasterCard">MasterCard</option>
+<option selected="selected" value="Discover">Discover</option>
+</select>""")
+        self.assertTrue(renderer.select("currency",
+                                        [["$", "Dollar"], ["DKK", "Kroner"]], None, prompt="Please choose ...") ==
+                        """<select id="currency" name="currency">
+<option selected="selected" value="">Please choose ...</option>
+<option value="$">Dollar</option>
+<option value="DKK">Kroner</option>
+</select>""")
+
+        try:
+            if isinstance(long, type):
+                self.assertTrue(renderer.select("privacy",
+                                                [(1, "Private"), (2, "Semi-public"), (3, "Public")], long(3)) ==
+                                """<select id="privacy" name="privacy">
+<option value="1">Private</option>
+<option value="2">Semi-public</option>
+<option selected="selected" value="3">Public</option>
+</select>""")
+        except NameError:
+                self.assertTrue(renderer.select("privacy", [(1, "Private"), (2, "Semi-public"), (3, "Public")], 3) ==
+                                """<select id="privacy" name="privacy">
+<option value="1">Private</option>
+<option value="2">Semi-public</option>
+<option selected="selected" value="3">Public</option>
+</select>""")
+
+        self.assertTrue(renderer.select("recipients", 
+                                        [([("u1", "User1"),
+                                           ("u2", "User2")], "Users"),
+                                         ([("g1", "Group1"),
+                                           ("g2", "Group2")], "Groups")], None) ==
+                        """<select id="recipients" name="recipients">
+<optgroup label="Users">
+<option value="u1">User1</option>
+<option value="u2">User2</option>
+</optgroup>
+<optgroup label="Groups">
+<option value="g1">Group1</option>
+<option value="g2">Group2</option>
+</optgroup>
+</select>""")
+
+    def test_select_with_tuple(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name": "Fred"})
+        renderer = FormRenderer(form)
+
+        options = (
+            ("Fred", "Fred"),
+            Option("Barney", "Barney"),
+            ("Wilma", "Wilma"),
+            ("Betty", "Betty"),
+        )
+
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
+<option selected="selected" value="Fred">Fred</option>
+<option value="Barney">Barney</option>
+<option value="Wilma">Wilma</option>
+<option value="Betty">Betty</option>
+</select>""")
+
+    def test_select_with_options_list(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name": "ValueFred"})
+        renderer = FormRenderer(form)
+
+        options = [
+            Option(value="ValueFred", label="LabelFred"),
+            Option(value="ValueBarney", label="LabelBarney"),
+            Option(value="ValueWilma", label="LabelWilma"),
+            Option(value="ValueBetty", label="LabelBetty"),
+        ]
+
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
+<option selected="selected" value="ValueFred">LabelFred</option>
+<option value="ValueBarney">LabelBarney</option>
+<option value="ValueWilma">LabelWilma</option>
+<option value="ValueBetty">LabelBetty</option>
+</select>""")
+
+    def test_select_with_options_obj(self):
+        from pyramid_simpleform import Form
+        from pyramid_simpleform.renderers import FormRenderer
+
+        request = testing.DummyRequest()
+        form = Form(request, SimpleFESchema, defaults={"name": "ValueFred"})
+        renderer = FormRenderer(form)
+
+        options = Options([
+            OptGroup("OptGroup", [Option(value="ValueOG", label="LabelOG")]),
+            Option(value="ValueFred", label="LabelFred"),
+            Option(value="ValueBarney", label="LabelBarney"),
+            Option(value="ValueWilma", label="LabelWilma"),
+            Option(value="ValueBetty", label="LabelBetty"),
+        ])
+
+        self.assertTrue(renderer.select("name", options) ==
+                        """<select id="name" name="name">
+<optgroup label="OptGroup">
+<option value="ValueOG">LabelOG</option>
+</optgroup>
+<option selected="selected" value="ValueFred">LabelFred</option>
+<option value="ValueBarney">LabelBarney</option>
+<option value="ValueWilma">LabelWilma</option>
+<option value="ValueBetty">LabelBetty</option>
+</select>""")
+
     def test_file(self):
   
         from pyramid_simpleform import Form
@@ -646,8 +789,8 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assert_(renderer.file('file') == \
-                   '<input id="file" name="file" type="file" />')
+        self.assertTrue(renderer.file('file') ==
+                        '<input id="file" name="file" type="file" />')
 
     def test_password(self):
   
@@ -658,8 +801,8 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assert_(renderer.password('password') == \
-                   '<input id="password" name="password" type="password" />')
+        self.assertTrue(renderer.password('password') ==
+                        '<input id="password" name="password" type="password" />')
 
 
     def test_radio(self):
@@ -671,11 +814,11 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : 'Fred'})
         renderer = FormRenderer(form)
         
-        self.assert_(renderer.radio("name", value="Fred") == \
+        self.assertTrue(renderer.radio("name", value="Fred") == \
                      '<input checked="checked" id="name_fred" name="name" '
                      'type="radio" value="Fred" />')
         
-        self.assert_(renderer.radio("name", value="Barney") == \
+        self.assertTrue(renderer.radio("name", value="Barney") == \
                      '<input id="name_barney" name="name" '
                      'type="radio" value="Barney" />')
 
@@ -688,7 +831,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.submit("submit", "Submit") == \
+        self.assertTrue(renderer.submit("submit", "Submit") == \
             '<input id="submit" name="submit" type="submit" value="Submit" />')
 
     def test_checkbox(self):
@@ -699,7 +842,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : True})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.checkbox("name") == \
+        self.assertTrue(renderer.checkbox("name") == \
             '<input checked="checked" id="name" name="name" type="checkbox" '
             'value="1" />')
 
@@ -711,11 +854,11 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.checkbox("name") == \
+        self.assertTrue(renderer.checkbox("name") == \
             '<input id="name" name="name" type="checkbox" '
             'value="1" />')
 
-        self.assert_(renderer.checkbox("name", checked=True) == \
+        self.assertTrue(renderer.checkbox("name", checked=True) == \
             '<input checked="checked" id="name" name="name" type="checkbox" '
             'value="1" />')
 
@@ -727,22 +870,22 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema, defaults={"name" : True})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.checkbox("name", checked=False) == \
+        self.assertTrue(renderer.checkbox("name", checked=False) == \
             '<input checked="checked" id="name" name="name" type="checkbox" '
             'value="1" />')
 
-        self.assert_(renderer.checkbox("name", checked=True) == \
+        self.assertTrue(renderer.checkbox("name", checked=True) == \
             '<input checked="checked" id="name" name="name" type="checkbox" '
             'value="1" />')
 
         form = Form(request, SimpleFESchema, defaults={"name" : False})
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.checkbox("name", checked=False) == \
+        self.assertTrue(renderer.checkbox("name", checked=False) == \
             '<input id="name" name="name" type="checkbox" '
             'value="1" />')
 
-        self.assert_(renderer.checkbox("name", checked=True) == \
+        self.assertTrue(renderer.checkbox("name", checked=True) == \
             '<input id="name" name="name" type="checkbox" '
             'value="1" />')
 
@@ -755,10 +898,10 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not(form.validate()))
+        self.assertTrue(not(form.validate()))
 
         renderer = FormRenderer(form)
-        self.assert_(renderer.is_error('name'))
+        self.assertTrue(renderer.is_error('name'))
 
     def test_errors_for(self):
 
@@ -770,10 +913,10 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         form = Form(request, SimpleFESchema)
 
-        self.assert_(not(form.validate()))
+        self.assertTrue(not(form.validate()))
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.errors_for('name') == ['Missing value'])
+        self.assertTrue(renderer.errors_for('name') == ['Missing value'])
 
     def test_errorlist(self):
 
@@ -788,7 +931,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.errorlist() == \
+        self.assertTrue(renderer.errorlist() == \
                      '<ul class="error"><li>Missing value</li></ul>')
      
 
@@ -806,7 +949,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
 
         renderer = FormRenderer(form)
 
-        self.assert_(renderer.errorlist() == '')
+        self.assertTrue(renderer.errorlist() == '')
 
     def test_errorlist_with_custom_localizer(self):
 
@@ -852,7 +995,7 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assert_(renderer.label("name") == \
+        self.assertTrue(renderer.label("name") == \
                    '<label for="name">Name</label>') 
 
     def test_label_using_field_name(self):
@@ -864,6 +1007,6 @@ class TestFormencodeFormRenderer(unittest.TestCase):
         form = Form(request, SimpleFESchema)
         renderer = FormRenderer(form)
        
-        self.assert_(renderer.label("name", "Your name") == \
+        self.assertTrue(renderer.label("name", "Your name") == \
                    '<label for="name">Your name</label>') 
 
