@@ -13,8 +13,6 @@ except IOError:
 requires = [
     'pyramid',
     'FormEncode',
-    'WebHelpers2; python_version>="3.3"',
-    'WebHelpers; python_version=="2.7"',
 ]
 
 testing_extras = [
@@ -52,6 +50,8 @@ setup(
     license="LICENSE.txt",
     install_requires=requires,
     extras_require={
+        ':python_version>="3.3"': ['WebHelpers2'],
+        ':python_version=="2.7"': ['WebHelpers'],
         'testing': testing_extras,
     },
     test_suite="pyramid_simpleform",
