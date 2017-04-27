@@ -1,5 +1,4 @@
 *$py.class
-*.cfg
 *.coverage
 *.db
 *.egg
