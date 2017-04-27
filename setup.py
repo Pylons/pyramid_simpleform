@@ -1,8 +1,6 @@
 import os
 
 from setuptools import setup, find_packages
-import platform
-import pkg_resources
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,50 +10,49 @@ try:
 except IOError:
     README = CHANGES = ''
 
-
-def package_installed(pkg):
-    """Check if package is installed"""
-    req = pkg_resources.Requirement.parse(pkg)
-    try:
-        pkg_resources.get_provider(req)
-    except pkg_resources.DistributionNotFound:
-        return False
-    else:
-        return True
-
 requires = [
     'pyramid',
     'FormEncode',
 ]
 
-if package_installed('WebHelpers2') or platform.python_version_tuple() >= ('3',):
-    requires.append('WebHelpers2')
-else:
-    requires.append('WebHelpers')
-
-tests_require = requires + [
+testing_extras = [
+    'coverage',
     'pyramid_mako',
+    'pytest',
+    'pytest-cov',
 ]
 
-setup(name='pyramid_simpleform',
-      version='0.7',
-      description='pyramid_simpleform',
-      long_description=README + '\n\n' + CHANGES,
-      classifiers=[
+setup(
+    name='pyramid_simpleform',
+    version='0.7-dev0',
+    description='pyramid_simpleform',
+    long_description=README + '\n\n' + CHANGES,
+    classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
-      author='Chris Lambacher',
-      author_email='chris@kateandchris.net',
-      url='https://github.com/Pylons/pyramid_simpleform',
-      keywords='web pyramid pylons',
-      packages=find_packages(),
-      include_package_data=True,
-      zip_safe=False,
-      license="LICENSE.txt",
-      install_requires=requires,
-      tests_require=tests_require,
-      test_suite="pyramid_simpleform",
-      )
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+    ],
+    author='Chris Lambacher',
+    author_email='chris@kateandchris.net',
+    url='https://github.com/Pylons/pyramid_simpleform',
+    keywords='web pyramid pylons',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    license="LICENSE.txt",
+    install_requires=requires,
+    extras_require={
+        ':python_version>="3.3"': ['WebHelpers2'],
+        ':python_version=="2.7"': ['WebHelpers'],
+        'testing': testing_extras,
+    },
+    test_suite="pyramid_simpleform",
+)
