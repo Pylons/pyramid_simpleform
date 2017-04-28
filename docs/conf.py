@@ -15,6 +15,7 @@ import sys, os
 import datetime
 import inspect
 import warnings
+import pkg_resources
 import pylons_sphinx_themes
 
 warnings.simplefilter('ignore', DeprecationWarning)
@@ -77,7 +78,7 @@ copyright = '%s, Dan Jacob' % datetime.datetime.now().year
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.6'
+version = pkg_resources.get_distribution('pyramid_simpleform').version
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -211,7 +212,7 @@ latex_documents = [
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-latex_use_parts = True
+latex_toplevel_sectioning = 'part'
 
 # Additional stuff for the LaTeX preamble.
 #latex_preamble = ''
@@ -220,7 +221,7 @@ latex_use_parts = True
 #latex_appendices = []
 
 # If false, no module index is generated.
-latex_use_modindex = False
+latex_domain_indices = False
 
 ## Say, for a moment that you have a twoside document that needs a 3cm
 ## inner margin to allow for binding and at least two centimetres the
