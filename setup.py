@@ -23,10 +23,11 @@ testing_extras = [
 ]
 
 docs_extras = [
-    'Sphinx >= 1.3.1', # Read The Docs minimum version
+    'Sphinx >= 1.3.1',  # Read The Docs minimum version
     'docutils',
     'repoze.sphinx.autointerface',
     'pylons-sphinx-themes',
+    'pyramid_mako',
 ]
 
 setup(
@@ -60,7 +61,7 @@ setup(
         ':python_version>="3.3"': ['WebHelpers2'],
         ':python_version=="2.7"': ['WebHelpers'],
         'testing': testing_extras,
-        'docs':docs_extras,
+        'docs': docs_extras,
     },
     test_suite="pyramid_simpleform",
 )
