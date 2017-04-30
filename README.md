@@ -2,4 +2,4 @@
 
 Simple form utilities for using [Pyramid](https://trypyramid.com/) with [FormEncode](https://pypi.python.org/pypi/FormEncode) and [WebHelpers](https://pypi.python.org/pypi/WebHelpers).
 
-Documentation: http://pyramid-simpleform.readthedocs.io/en/latest/
+Documentation: http://docs.pylonsproject.org/projects/pyramid-simpleform/en/latest/
