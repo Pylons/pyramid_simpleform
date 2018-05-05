@@ -175,7 +175,7 @@ CSRF Validation
             
             token = event.request.POST.get("_csrf")
             if token is None or token != event.request.session.get_csrf_token():
-                raise HTTPForbidden, "CSRF token is missing or invalid"
+                raise HTTPForbidden("CSRF token is missing or invalid")
 
 However the **FormRenderer** class has a couple of helper methods for rendering the CSRF hidden input. **csrf()** just prints the input tag, while **csrf_token()** wraps the input in a hidden DIV to keep your markup valid.
 
